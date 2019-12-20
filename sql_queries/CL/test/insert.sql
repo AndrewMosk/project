@@ -1,0 +1,1 @@
+INSERT INTO ora_replog999 ("N_TABLE", "R_TABLE") VALUES ('%s','%s')

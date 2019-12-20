@@ -1,0 +1,2 @@
+String sql = String.format("DELETE FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"R_TABLE\" = '%s'", name, cod);
+String sql = String.format("INSERT INTO ora_replog999 (\"N_TABLE\", \"R_TABLE\") VALUES ('%s','%s')", name, cod);
