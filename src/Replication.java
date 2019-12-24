@@ -43,7 +43,12 @@ public class Replication{
                 for (int i = 1; i < tables.length; i++) {
                     //replicateTable(tables[0], tables[i]);
                     // ЗАГРУЗКА ПОДЧИНЕННОЙ ТАБЛИЦЫ ПОСТРОЧНО!
+                    // и как загружать построчно? а загружать нужно следующим образом - тот же самый скрипт, что и для основной таблицы, только в массиве будет 1 элемент
+                    // нужно проверить, есть ли разница между (r = %s) и (r IN (%s)) при условии, что в массиве один элемент
+                    // хотя, наверное, лучше все таки переделать
                     // ЗАПИСЬ ОШИБКИ В БД - ПАРСИТЬ СТРОКУ, ЧТОБ ВЫЧЛЕНИТЬ КОД - коды записывать уже с кавычками! ' '
+                    // ЧТЕНИЕ ИЗ ФАЙЛА ОДНОГО СКРИПТА ДЕЛАТЬ 1 РАЗ!!! В СТРОКУ СЧИТЫВАТЬ, ПОТОМ ТОЛЬКО ЗНАЧЕНИЯ ПОДСТАВЛЯТЬ
+
                     String t = tables[i];
                 }
             }
@@ -140,6 +145,9 @@ public class Replication{
     }
 
     private void replicateTable(String mainTable, String currentTable) throws SQLException {
+        // коды ошибок добавляю сразу в запрос к реплогу!
+        // но не здесь!! этот фильтр нужно ставить на момент, когда я из базы в программу подкачиваю все коды из реплога!
+
         ResultSet rs = stmt.executeQuery(getReplicationLog(currentTable, "S", "")); // ДОБАВИТЬ КОДЫ ОШИБОК!
         ArrayList<String> list = new ArrayList<>();
         while (rs.next()) {
@@ -150,7 +158,7 @@ public class Replication{
         listString.replace(0,1,"(");
         listString.replace(listString.length()-1,listString.length(),")");
 
-        String sql = String.format(Database.readSqlQuery("scripts/" + mainTable + "/s/" + currentTable + ".sql"), listString);
+        String sql = String.format(Database.readSqlQuery("scripts/" + mainTable.toLowerCase() + "/s/" + currentTable.toLowerCase() + ".sql"), listString);
 
         int updatedRows = stmt.executeUpdate(sql);
 
@@ -194,7 +202,7 @@ public class Replication{
     }
 
     private String gerError(String table) {
-        return String.format("SELECT r FROM errorrepllog WHERE table = '%s'", table);
+        return String.format("SELECT r FROM error_repl_log WHERE table = '%s'", table);
     }
 
     private String[][] getTables() {
