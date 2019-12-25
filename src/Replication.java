@@ -1,43 +1,43 @@
-import db.Database;
-import email.Mail;
+import service.Database;
+import service.Mail;
+import service.Utils;
 import java.sql.*;
 import java.util.*;
 
 public class Replication{
-    private Connection connection;
+    //private Connection connection;
     private Statement stmt;
     private Map<String , ArrayList<String>> states;
     //private PreparedStatement preparedStatement;
 
     public Replication() {
-        this.connection = Database.getConnection();
+        //Connection connection = Database.getConnection();
         this.stmt = Database.getStmt();
         this.states =  new TreeMap<String, ArrayList<String>>();
     }
 
     public void startReplication() throws SQLException {
-        String[][] tablesArray = getTables();
+        String[][] tablesArray = Utils.getTables();
+        String mainTable;
         int updatedRows;
 
         for (String[] tables : tablesArray) {
             updatedRows = 0;
             // нулевой элемент массива - таблица-владелец. алгоритм ее загрузки отличается - ее гружу не по строчно, а пачкой
             // есть массив с неструктурированными таблицами (не имеют таблицы-владельца), тогда нулевой элемент - пустая строка
-            boolean isMainTableEmpty = tables[0].isEmpty();
+            mainTable = tables[0];
+            boolean isMainTableEmpty = mainTable.isEmpty();
+
+            // подгружаю все данные на обмен по текущим таблицам
             uploadDataForReplication(tables, isMainTableEmpty);
 
-            if (isMainTableEmpty) {
-                updatedRows = replicateMainTable(tables[0]);
+            // если основная таблица не пуста, загружаю ее
+            if (!isMainTableEmpty) {
+                updatedRows = replicateMainTable(mainTable);
             }
 
-            // отправка оповещения об ошибке загрузки таблицы-владельца. -1 вернется только из блока catch, если будет выброшено исключение
-            // если загружено 0 строк или таблица-владелец отсутствует, то сюда придет 0 и алгоритм пойдет по ветке else
-            if (updatedRows == -1) {
-                // в загрузке главной таблицы ошибок быть не должно. потому если вернулся код ошибки (-1), работу прекращаю и оповещаю об ошибке.
-                Mail mail = new Mail();
-                mail.send("Ошибка загрузки таблицы " + tables[0], "Ошибка!", "support@t-project.com", "moskaletsandrey@yandex.ru");
-            }else {
-                // если родительская таблица загружена без ошибок, начинаю загрузку подчиненных
+            //  -1 вернется только из блока catch, если будет выброшено исключение, во всех остальных случаях продолжаю загрузку
+            if (updatedRows != -1) {
                 System.out.println("Загружена таблица " + tables[0] +" Изменено " + updatedRows + " строк.");
 
                 for (int i = 1; i < tables.length; i++) {
@@ -60,7 +60,7 @@ public class Replication{
     private void uploadDataForReplication(String[] tables, boolean isMainTableEmpty) throws SQLException {
         states.clear();
         String sql;
-        String errors = "";
+        //String errors = "";
         int startIndex = 0;
         // если нулевой элемент пуст (таблица владелец не задана), то обход массива начинаю с первого элемента
         if (isMainTableEmpty) {
@@ -68,9 +68,7 @@ public class Replication{
         }
 
         for (int i = startIndex; i < tables.length; i++) {
-            // не включаю в выгрузку строки, по текущей таблице из лога ошибок
-            errors = uploadErrorRows(tables[i]);
-            sql = getReplicationLog(tables[i], "S", errors);
+            sql = Utils.getReplicationLog(tables[i], "S");
 
             ResultSet rs = stmt.executeQuery(sql);
             ArrayList<String> listUpdateInsert = new ArrayList<>();
@@ -82,25 +80,11 @@ public class Replication{
         }
     }
 
-    private String  uploadErrorRows(String table) throws SQLException {
-        ArrayList<String> errorRows = new ArrayList<>();
-        String errorRowsString = "";
-        String sql = gerError(table);
-
-        ResultSet rs = stmt.executeQuery(sql);
-        while (rs.next()) {
-            errorRows.add("'" + rs.getString("r") +"'");
-        }
-        if (errorRows.size() > 0) {
-            errorRowsString = errorRows.toString();
-            errorRowsString = changeBrackets(errorRowsString);
-        }
-        return errorRowsString;
-    }
-
     private int replicateMainTable(String table) throws SQLException {
+        // на сколько я понимаю, здесь манипуляции с коммитом тоже не нужны. по умолчанию автокоммит = истина, т.е. после каждого апдейта
+        // изменения сохраняются в БД, ну а в случае ошибки во время выполнения инсерта/апдейта происходит откат и ничего не записывается, так что комментирую
         int updatedRows = 0;
-        connection.setAutoCommit(false);
+        //connection.setAutoCommit(false);
 
         ArrayList<String> listUpdateInsert = states.get(table);
         int limit = 1000;
@@ -121,19 +105,18 @@ public class Replication{
                 listUpdateInsertLimited = listUpdateInsert.subList(i * limit, upperLimit);
 
                 listToString = listUpdateInsertLimited.toString();
-                listToString = changeBrackets(listToString);
+                listToString = Utils.changeBrackets(listToString);
 
-                sql = String.format(Database.readSqlQuery("scripts/" + table + "/s/" + table + ".sql"), listToString);
+                sql = String.format(Utils.readSqlQuery("scripts/" + table + "/s/" + table + ".sql"), listToString);
                 updatedRows += stmt.executeUpdate(sql);
 
-                sql = deleteFromReplicationLog(table, listToString);
+                sql = Utils.deleteFromReplicationLog(table, listToString);
                 stmt.executeUpdate(sql);
 
-                connection.commit();
+                //connection.commit();
             }
         }catch (Exception e) {
-            e.printStackTrace();
-            connection.rollback();
+            //connection.rollback();
             // оповещение об ошибке
             Mail mail = new Mail();
             mail.send("Ошибка загрузки таблицы " + table, e.getMessage(), "support@t-project.com", "moskaletsandrey@yandex.ru");
@@ -145,76 +128,38 @@ public class Replication{
     }
 
     private void replicateTable(String mainTable, String currentTable) throws SQLException {
-        // коды ошибок добавляю сразу в запрос к реплогу!
-        // но не здесь!! этот фильтр нужно ставить на момент, когда я из базы в программу подкачиваю все коды из реплога!
+        int updatedRows = 0;
+        // нужен ли тут автокиммит фолс? думаю, что не нужен! почему? да потому что пройденная строка должна
+        // тут зависит от того, как именно будут записыаться данные.
+        // а записываться они будут построчно в блоке try catch.
+        // получается так: есть массив кодов, прохожу его в цикле, инсерт/апдейт прошел - хорошо, удаляется строка из реплога и коммит
+        // след итерация: инсерт/апдейт не прошел - ошибка! идет запись в БД ошибки, коммита нет, идет следующая итерация
+        // а в следующую репликацию строка уже не попадет - отсеится по отбору (не в селекте из лога ошибок)
 
-        ResultSet rs = stmt.executeQuery(getReplicationLog(currentTable, "S", "")); // ДОБАВИТЬ КОДЫ ОШИБОК!
-        ArrayList<String> list = new ArrayList<>();
-        while (rs.next()) {
-            list.add(rs.getString("r_table"));
+        //  и вопрос - нужен ли в итоге автокоммит? думается мне, что не нужен! автокомиит - тру, это когда каждый вызов инсерта/апдейта происходит в отдельной транзакции
+        // что по логике моего алгортима как раз мне и требуется!
+
+        //connection.setAutoCommit(false);
+
+        ArrayList<String> listUpdateInsert = states.get(mainTable);
+
+        for (String code: listUpdateInsert) {
+            // инсерт/апдейт строки в базу
+            try {
+                String sql = String.format(Utils.readSqlQuery("scripts/" + mainTable.toLowerCase() + "/s/" + currentTable.toLowerCase() + ".sql"), code);
+                updatedRows += stmt.executeUpdate(sql);
+
+                // удаление строки из реплога
+                //...
+            } catch (Exception e) {
+                // запись в БД информации об ошибке
+                String sql = Utils.insertToErrorLog(code, currentTable, e.getMessage());
+                stmt.executeUpdate(sql);
+            }
+
+
         }
 
-        StringBuilder listString = new StringBuilder(list.toString());
-        listString.replace(0,1,"(");
-        listString.replace(listString.length()-1,listString.length(),")");
 
-        String sql = String.format(Database.readSqlQuery("scripts/" + mainTable.toLowerCase() + "/s/" + currentTable.toLowerCase() + ".sql"), listString);
-
-        int updatedRows = stmt.executeUpdate(sql);
-
-        // запуск в цикле, пока не вернтеся 0
-
-//        // массив как параметр запроса
-//        String sql = String.format("select c_client from cl where c_client in %s", listString);
-//        rs = null;
-//        rs = stmt.executeQuery(sql);
-//
-//        ArrayList<String> list1 = new ArrayList<>();
-//        while (rs.next()) {
-//            list1.add(rs.getString("c_client"));
-//        }
-//        int i = 1;
-//        System.out.println(list1);
     }
-
-    // служебные
-    private String changeBrackets(String string) {
-        string = string.replace("[", "(");
-        string = string.replace("]", ")");
-
-        return string;
-    }
-
-    private String getReplicationLog(String n_table, String operation, String errorCodes) {
-        if (errorCodes.isEmpty()) {
-            return String.format("SELECT ora_replog999.\"R_TABLE\" FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"OPER\" = '%s' ", n_table, operation);
-        } else {
-            return String.format("SELECT ora_replog999.\"R_TABLE\" FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"OPER\" = '%s' AND \"R_TABLE\" NOT IN %s", n_table, operation, errorCodes);
-        }
-    }
-
-    private String deleteFromReplicationLog(String n_table, String codes) {
-        return String.format("DELETE FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"R_TABLE\" IN %s", n_table, codes);
-    }
-
-    private String getCount(String n_table, String operation) {
-        return String.format("SELECT COUNT(*) FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"OPER\" = '%s'", n_table, operation);
-    }
-
-    private String gerError(String table) {
-        return String.format("SELECT r FROM error_repl_log WHERE table = '%s'", table);
-    }
-
-    private String[][] getTables() {
-        return new  String[][]  {
-                {"CL", "CL_ADDRESS", "CL_BANK", "CL_CONTACT", "CL_OKVED", "CL_P", "CL_POTR", "CL_POTRV", "CL_PSPIS", "CL_REZ", "CL_MV", "CL_MVNP", "CL_MVPERS", "CL_MVRAB",
-                        "CL_MVSPIS", "CL_Z", "CL_ZSPIS", "CL_ZV", "CL_ZVSPIS", "CL_SR"}
-
-//                {"PERS", "PERS_BOLN", "PERS_BOOK", "PERS_DEF", "PERS_LANG", "PERS_OR", "PERS_PCL", "PERS_POOR", "PERS_PROF", "PERS_PROFIL", "PERS_REZ", "PERS_SIELEV", "PERS_SPEC",
-//                        "PERS_SPEN", "PERS_STAJ"}
-        };
-    }
-
-
-
 }
