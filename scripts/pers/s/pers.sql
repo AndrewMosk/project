@@ -1,4 +1,6 @@
-﻿INSERT INTO
+﻿DO $$
+BEGIN
+INSERT INTO
 	pers ("reg_num", "reg_bak" , "reg_id", "cz_cod", "czu_cod", "plc_cod", "status", "reg_status", "reg_sost1", "reg_sost2", "reg_date", "regd_date", "fam", "nam", 
 		"famn", "name", "date_borth", "sex", "doctype", "austype", "ausnum", "sprav", "ausd", "ausp", "date_doc", "citizenship", "b_country", "b_region", "b_ra", 
 		"place_borth", "post_i", "street_cod", "aoid_j", "houseid_j", "building", "house", "apart", "comm_j", "adress_old", "paoid_f", "post_i_f", "aoid_f", 
@@ -27,7 +29,7 @@ SELECT	ora_pers.reg_num, ora_pers.reg_bak , ora_pers.reg_id, ora_pers.cz_cod, or
 		pers_dop.r_mvrab, pers_dop.comm, ora_pers.pers_num, ora_pers.pers_nump, ora_pers.pers_comj, ora_pers.pers_prof, ora_pers.date_end, ora_pers.date_z, 
 		ora_pers.date_z1, ora_pers.p_modi, ora_pers.d_modi FROM ora_pers 
 	LEFT JOIN (SELECT * FROM ora_pers_dop WHERE ora_pers_dop.reg_num IN %s) AS pers_dop
-		ON ora_pers.reg_num = pers_dop.reg_num WHERE ora_pers.reg_num IN(SELECT ora_replog_temp."R_TABLE"::numeric FROM ora_replog_temp)
+		ON ora_pers.reg_num = pers_dop.reg_num WHERE ora_pers.reg_num %s
 ON CONFLICT ("reg_num") DO UPDATE SET "reg_num" = EXCLUDED.reg_num, "reg_bak" = EXCLUDED.reg_bak , "reg_id" = EXCLUDED.reg_id, "cz_cod" = EXCLUDED.cz_cod, 
 		"czu_cod" = EXCLUDED.czu_cod, "plc_cod" = EXCLUDED.plc_cod, "status" = EXCLUDED.status, "reg_status" = EXCLUDED.reg_status, "reg_sost1" = EXCLUDED.reg_sost1, 
 		"reg_sost2" = EXCLUDED.reg_sost2, "reg_date" = EXCLUDED.reg_date, "regd_date" = EXCLUDED.regd_date, "fam" = EXCLUDED.fam, "nam" = EXCLUDED.nam, 
@@ -56,3 +58,7 @@ ON CONFLICT ("reg_num") DO UPDATE SET "reg_num" = EXCLUDED.reg_num, "reg_bak" = 
 		"srm" = EXCLUDED.srm, "pts" = EXCLUDED.pts, "katv" = EXCLUDED.katv, "r_mv" = EXCLUDED.r_mv, "r_mvrab" = EXCLUDED.r_mvrab, "comm" = EXCLUDED.comm, 
 		"pers_num" = EXCLUDED.pers_num, "pers_nump" = EXCLUDED.pers_nump, "pers_comj" = EXCLUDED.pers_comj, "pers_prof" = EXCLUDED.pers_prof, 
 		"date_end" = EXCLUDED.date_end, "date_z" = EXCLUDED.date_z, "date_z1" = EXCLUDED.date_z1, "p_modi" = EXCLUDED.p_modi, "d_modi" = EXCLUDED.d_modi;
+--удаляю обработанные строки из оракл		
+DELETE FROM ora_replog999 WHERE "N_TABLE" = 'PERS' AND "R_TABLE" IN %s;
+END;
+$$ LANGUAGE plpgsql;

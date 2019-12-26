@@ -1,4 +1,6 @@
-﻿INSERT INTO
+﻿DO $$
+BEGIN
+INSERT INTO
 	pers_or ("dir_num", "reg_num", "vac_num", "agr_cod", "con_num", "con_date", "or_beg", "or_end", "or_sal", "or_npri", "or_dtpri", "or_rez_date", "npri", "dtpri", 
 		"rez_or_beg", "rez_or_end", "rez_det", "rez_osn", "kyv_cod", "rez_date", "plc_cod", "p_modi", "d_modi")
 SELECT "dir_num", "reg_num", "vac_num", "agr_cod", "con_num", "con_date", "or_beg", "or_end", "or_sal", "or_npri", "or_dtpri", "or_rez_date", "npri", "dtpri", 
@@ -11,3 +13,7 @@ ON CONFLICT ("dir_num") DO UPDATE SET "reg_num" = EXCLUDED.reg_num, "vac_num" = 
 		"or_dtpri" = EXCLUDED.or_dtpri, "or_rez_date" = EXCLUDED.or_rez_date, "npri" = EXCLUDED.npri, "dtpri" = EXCLUDED.dtpri, "rez_or_beg" = EXCLUDED.rez_or_beg, 
 		"rez_or_end" = EXCLUDED.rez_or_end, "rez_det" = EXCLUDED.rez_det, "rez_osn" = EXCLUDED.rez_osn, "kyv_cod" = EXCLUDED.kyv_cod, "rez_date" = EXCLUDED.rez_date, 
 		"plc_cod" = EXCLUDED.plc_cod, "p_modi" = EXCLUDED.p_modi, "d_modi" = EXCLUDED.d_modi;
+--удаляю обработанные строки из оракл		
+DELETE FROM ora_replog999 WHERE "N_TABLE" = 'PERS_OR' AND "R_TABLE" = '%s';
+END;
+$$ LANGUAGE plpgsql;

@@ -41,7 +41,6 @@ public class Replication{
             for (int i = 1; i < tables.length; i++) {
                 replicateTable(mainTable, tables[i]);
             }
-
         }
     }
 
@@ -99,7 +98,12 @@ public class Replication{
                 listToString = listUpdateInsertLimited.toString();
                 listToString = Utils.changeBrackets(listToString);
 
-                sql = String.format(sql, listToString, listToString);
+                if (table.equals("PERS")) {
+                    // в скрипте PERS параметр нужно задать трижды
+                    sql = String.format(sql, listToString, listToString, listToString);
+                }else {
+                    sql = String.format(sql, listToString, listToString);
+                }
                 stmt.executeUpdate(sql);
 
             }
