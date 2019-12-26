@@ -40,18 +40,6 @@ public class Utils {
         return String.format(sql, n_table, operation, n_table);
     }
 
-//    public static String deleteFromReplicationLogArray(String n_table, String codes) {
-//        return String.format("DELETE FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"R_TABLE\" IN %s", n_table, codes);
-//    }
-//
-//    public static String deleteFromReplicationLogString(String n_table, String code) {
-//        return String.format("DELETE FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"R_TABLE\" = '%s'", n_table, code);
-//    }
-
-//    public static String getCount(String n_table, String operation) {
-//        return String.format("SELECT COUNT(*) FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"OPER\" = '%s'", n_table, operation);
-//    }
-
     public static String[][] getTables() {
         return new  String[][]  {
                 {"CL", "CL_ADDRESS", "CL_BANK", "CL_CONTACT", "CL_OKVED", "CL_P", "CL_POTR", "CL_POTRV", "CL_PSPIS", "CL_REZ", "CL_MV", "CL_MVNP", "CL_MVPERS", "CL_MVRAB",

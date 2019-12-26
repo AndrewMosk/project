@@ -12,6 +12,7 @@ public class Main {
             replication.startReplication();
 
         } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
             Mail mail = new Mail();
             mail.send("Ошибка старта репликации", e.getMessage(), "support@t-project.com", "moskaletsandrey@yandex.ru");
         }
