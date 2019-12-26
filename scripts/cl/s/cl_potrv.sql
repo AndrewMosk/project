@@ -1,4 +1,6 @@
-﻿INSERT INTO
+﻿DO $$
+BEGIN
+INSERT INTO
 	cl_potrv ("vac_num", "type_cod", "in_date", "cz_cod", "c_client", "c_contact", "prof_cod", "pd_cod", "prof_lev", "prof_spec", "are_cod", "jreg_cod", "job_time", 
 		"salary", "salary1", "pr_salary", "salf_cod", "jchar_cod", "jcond_cod", "start_free", "max_dir", "max_spr", "vac_adress", "vac_way", "vac_sob", "p_ra", 
 		"spe_cod", "stin_cod", "ncp_cod", "pr_comp", "cntc_cod", "pr_irs", "ident_yn", "pr_show", "ness_stage", "educ_cod", "driv_cod", "okso_cod", "spec_cod", 
@@ -24,3 +26,6 @@ ON CONFLICT ("vac_num") DO UPDATE SET "type_cod" = EXCLUDED.type_cod, "in_date" 
 		"treb" = EXCLUDED.treb, "adinf70" = EXCLUDED.adinf70, "adinfcl" = EXCLUDED.adinfcl, "adinf" = EXCLUDED.adinf, "att_f" = EXCLUDED.att_f, 
 		"beg_date" = EXCLUDED.beg_date, "end_date" = EXCLUDED.end_date,  "rem_text" = EXCLUDED.rem_text, "vac_guid" = EXCLUDED.vac_guid, "r" = EXCLUDED.r, 
 		"p_modi" = EXCLUDED.p_modi, "d_modi" = EXCLUDED.d_modi;
+DELETE FROM ora_replog999 WHERE "N_TABLE" = 'CL_POTRV' AND "R_TABLE" = '%s';
+END;
+$$ LANGUAGE plpgsql;

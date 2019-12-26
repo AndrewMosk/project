@@ -1,4 +1,6 @@
-﻿INSERT INTO
+﻿DO $$
+BEGIN
+INSERT INTO
 	cl_zv ("r", "c_client", "cz_cod", "k_all", "k_ir", "shifr", "pol_date", "in_cod", "in_num", "in_date", "out_num", "out_date", "kzn_org", "kzn_num", "kzn_date", 
 		"year", "prim", "fok_cod", "r_e", "comm", "p_modi", "d_modi", "d_ins")
 SELECT "r", "c_client", "org_cod" AS "cz_cod", "k_all", "k_ir", "shifr", "pol_date", "in_cod", "in_num", "in_date", "out_num", "out_date", "kzn_org", "kzn_num", 
@@ -11,3 +13,6 @@ ON CONFLICT ("r") DO UPDATE SET "c_client" = EXCLUDED.c_client, "cz_cod" = EXCLU
 		"out_date" = EXCLUDED.out_date, "kzn_org" = EXCLUDED.kzn_org, "kzn_num" = EXCLUDED.kzn_num, "kzn_date" = EXCLUDED.kzn_date, "year" = EXCLUDED.year, 
 		"prim" = EXCLUDED.prim, "fok_cod" = EXCLUDED.fok_cod, "r_e" = EXCLUDED.r_e, "comm" = EXCLUDED.comm, "p_modi" = EXCLUDED.p_modi, "d_modi" = EXCLUDED.d_modi, 
 		"d_ins" = EXCLUDED.d_ins;
+DELETE FROM ora_replog999 WHERE "N_TABLE" = 'CL_ZV' AND "R_TABLE" = '%s';
+END;
+$$ LANGUAGE plpgsql;
