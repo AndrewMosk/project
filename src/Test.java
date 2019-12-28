@@ -2,22 +2,36 @@ import service.Database;
 import service.Mail;
 import service.Utils;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class Test {
     public static void main(String[] args) {
 
-//        String errorSql = "ERROR: error fetching result: OCIStmtFetch2 failed to fetch next result row\n" +
-//                "  Подробности: ORA-08177: can't serialize access for this transaction";
-////        String errorSql = "ORA-01555 snapshot too old: rollback segment number string with name \"string\" too small.";
-////        String errorSql = "ERROR:  insert or update on table \"cl_address\" violates foreign key constraint \"cl_address_fk\"\n" +
-////                "DETAIL:  Key (c_client)=(1310050053) is not present in table \"cl\".";
+//        String[][] tablesArray = Utils.getTables();
 //
-//        System.out.println(errorSql.contains("08177"));
-//        System.out.println(errorSql.contains("01555"));
+//        String[] tables = tablesArray[0];
+//        String sql;
 //
-//        System.out.println (!(errorSql.contains("08177") || errorSql.contains("01555")));
+//        for (int i = 1; i < tables.length; i++) {
+//            sql = Utils.getReplicationLog(tables[i].replace("*", ""), "S");
+//
+//            //ResultSet rs = stmt.executeQuery(sql);
+//            ArrayList<String> listUpdateInsert = new ArrayList<>();
+//            //while (rs.next()) {
+//                if (tables[i].startsWith("*")) {
+//                    //listUpdateInsert.add("'" + rs.getString("r_table") + "'");
+//                    int a = 1;
+//                }else {
+//                    //listUpdateInsert.add(rs.getString("r_table"));
+//                    int b = 2;
+//                }
+//            //}
+//
+//            //states.put(tables[i], listUpdateInsert);
+//        }
 
     }
 
