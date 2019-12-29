@@ -16,6 +16,7 @@ public class Replication{
     }
 
     public void startReplication() throws SQLException {
+        System.out.println("start replication");
         String[][] tablesArray = Utils.getTables();
         boolean loadSuccessful;
         //String mainTable;
@@ -40,7 +41,7 @@ public class Replication{
             for (int i = 1; i < tables.length; i++) {
 
                 if (tables[i].startsWith("*")) {
-                    loadSuccessful = packageLoad(dir, tables[i].replace("*",""));
+                    loadSuccessful = packageLoad(dir, tables[i]);
 
                     // loadSuccessful ложь только в том случае, когда произошлоа ошибка загрузки родительской таблицы
                     // в этом случае загрузку таблиц-наследников тоже прерываю и перехожу к следующему блоку таблиц
@@ -63,8 +64,10 @@ public class Replication{
 
             ResultSet rs = stmt.executeQuery(sql);
             ArrayList<String> listUpdateInsert = new ArrayList<>();
+            boolean startsWithStar = tables[i].startsWith("*");
+
             while (rs.next()) {
-                if (tables[i].startsWith("*")) {
+                if (startsWithStar) {
                     listUpdateInsert.add("'" + rs.getString("r_table") + "'");
                 }else {
                     listUpdateInsert.add(rs.getString("r_table"));
@@ -76,19 +79,22 @@ public class Replication{
     }
 
     private boolean packageLoad(String dir, String table) throws SQLException {
+        System.out.println("start packageLoad " + table);
         // на сколько я понимаю, здесь манипуляции с коммитом тоже не нужны. по умолчанию автокоммит = истина, т.е. после каждого апдейта
         // изменения сохраняются в БД, ну а в случае ошибки во время выполнения инсерта/апдейта происходит откат и ничего не записывается, так что комментирую
         String errorSql;
 
         // получаю список кодов по текущей таблице
         ArrayList<String> listUpdateInsert = states.get(table);
+        table = table.replace("*","");
+
         // задаю лимит на загрузку
         int limit = 100000;
         int numberIterations = (int)Math.ceil(listUpdateInsert.size()/(double)limit);
         //подгружаю текст sql запроса
-        String sql = Utils.readSqlQuery("scripts/" + table + "/s/" + table + ".sql");
+        String sqlQuery = Utils.readSqlQuery("scripts/" + dir + "/s/" + table.toLowerCase() + ".sql");
+        String sql;
         String listToString;
-
 
         List<String> listUpdateInsertLimited;
         for (int i = 0; i < numberIterations; i++) {
@@ -106,9 +112,9 @@ public class Replication{
 
                 if (table.equals("PERS")) {
                     // в скрипте PERS параметр нужно задать трижды
-                    sql = String.format(sql, listToString, listToString, listToString);
+                    sql = String.format(sqlQuery, listToString, listToString, listToString);
                 } else {
-                    sql = String.format(sql, listToString, listToString);
+                    sql = String.format(sqlQuery, listToString, listToString);
                 }
                 stmt.executeUpdate(sql);
             }catch (Exception e) {
@@ -128,32 +134,35 @@ public class Replication{
                 }
             }
         }
-
+        System.out.println("finish packageLoad " + table);
         return true;
     }
 
     private void lineByLineLoad(String dir, String currentTable) throws SQLException {
+        System.out.println("start lineByLineLoad " + currentTable);
         // получаю список кодов по текущей таблице
         ArrayList<String> listUpdateInsert = states.get(currentTable);
         //подгружаю текст sql запроса
-        String sql = Utils.readSqlQuery("scripts/" + dir + "/s/" + currentTable.toLowerCase() + ".sql");
+        String sqlQuery = Utils.readSqlQuery("scripts/" + dir + "/s/" + currentTable.toLowerCase() + ".sql");
+        String sql;
         String errorSql;
         for (String code: listUpdateInsert) {
             // построчная обработка данных
             try {
                 // инсерт/апдейт строки в базу и удаление из replog
-                sql = String.format(sql, code, code);
+                sql = String.format(sqlQuery, code, code);
                 stmt.executeUpdate(sql);
             } catch (Exception e) {
                 // проверяю, что не содержит коды ошибок связанных транзакциями
                 if (!transactionError(e.getMessage())) {
                     // запись в БД информации об ошибке
-                    errorSql = Utils.insertToErrorLog(code, currentTable, e.getMessage());
+                    errorSql = Utils.insertToErrorLog(code, currentTable, e.getMessage().replace("'",""));
 
                     stmt.executeUpdate(errorSql);
                 }
             }
         }
+        System.out.println("finish lineByLineLoad " + currentTable);
     }
 
     private boolean transactionError(String message) {
