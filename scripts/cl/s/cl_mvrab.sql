@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_mvrab ("r", "r_mv", "fio", "date_borth", "dfree", "sex", "age", "prof", "prof_cod", "distr", "c_distr", "p_ra", "educ", "educ_cod", "salary", "kat", "comm", 

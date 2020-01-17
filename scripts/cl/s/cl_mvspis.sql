@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_mvspis ("r", "r_mv", "year", "kv", "kv_date", "f_v", "f_vi", "f_trud", "f_trud_cl", "f_pens", "r1", "r2", "r3", "r4", "r5", "r6", "f_v1", "f_v2", 

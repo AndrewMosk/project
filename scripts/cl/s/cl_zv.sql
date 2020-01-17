@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_zv ("r", "c_client", "cz_cod", "k_all", "k_ir", "shifr", "pol_date", "in_cod", "in_num", "in_date", "out_num", "out_date", "kzn_org", "kzn_num", "kzn_date", 

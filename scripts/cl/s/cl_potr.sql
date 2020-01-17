@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_potr ("r", "date_doc", "c_client", "cz_cod", "c_contact", "fok_cod", "vac_adress", "vac_way", "adinfcl", "stat", "date_stat", "stat_comm", "date_reg", 

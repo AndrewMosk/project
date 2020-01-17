@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_sr ("r", "c_client", "year", "month", "kol", "doc_typ", "doc_date", "doc_num", "p_modi", "d_modi")

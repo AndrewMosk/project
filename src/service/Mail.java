@@ -9,9 +9,11 @@ public class Mail {
 
     private String username;
     private String password;
+    private String toEmail;
     private Properties props;
 
     public Mail() {
+        this.toEmail = "moskaletsandrey@yandex.ru";
         this.username = "sender.tproject@gmail.com";
         this.password = "XAMOf5ckFB~8bNPV6mDiwURM";
 
@@ -23,7 +25,7 @@ public class Mail {
         props.put("mail.smtp.port", "465");
     }
 
-    public void send(String subject, String text, String fromEmail, String toEmail){
+    public void send(String subject, String text){
         Session session = Session.getDefaultInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);

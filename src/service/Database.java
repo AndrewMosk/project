@@ -10,10 +10,6 @@ public class Database {
     static final String USER = "kzn";
     static final String PASS = "lFg$zNum";
 
-//    public static Connection getConnection() {
-//        return connection;
-//    }
-
     public static Statement getStmt() {
         return stmt;
     }

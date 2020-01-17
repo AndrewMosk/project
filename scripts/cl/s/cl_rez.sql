@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_rez ("r","r_i","c_client","rez_det","rez_osn","date_rez","date_begin","date_end","doc_num","doc_date","doc_sum","rab","date_rab","c_contact","comm","fok_cod",

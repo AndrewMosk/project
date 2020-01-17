@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_p ("r", "cz_cod", "c_client", "date_beg", "date_end", "tel", "k_all", "k_alli", "r1", "r2", "r3", "r4", "r5", "r6", "ri1", "ri2", "ri3", "ri4", "ri5", "ri6", 

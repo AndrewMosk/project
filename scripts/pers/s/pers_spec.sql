@@ -1,4 +1,6 @@
-﻿INSERT INTO
+DO $$
+BEGIN
+INSERT INTO
 	pers_spec ("r", "reg_num", "okso_cod", "speco_cod", "spec_cod", "spec_name", "prof_cod", "pd_cod", "prof_lev", "prof_name", "date_end", "rpu_fob", "rpu_ppo", 
 		"c_client", "c_name", "spec_typ", "spec_doc", "spec_date", "date_rez", "spec_stage", "spec_stage5", "st", "p_modi", "d_modi")
 SELECT "r", "reg_num", "okso_cod", "speco_cod", "spec_cod", "spec_name", "prof_cod", "prof_pd" AS "pd_cod", "prof_lev", "prof_name", "date_end", FOB.rpu_fob, 
@@ -13,3 +15,7 @@ ON CONFLICT ("r") DO UPDATE SET "reg_num" = EXCLUDED.reg_num, "okso_cod" = EXCLU
 		"date_end" = EXCLUDED.date_end, "rpu_fob" = EXCLUDED.rpu_fob, "rpu_ppo" = EXCLUDED.rpu_ppo, "c_client" = EXCLUDED.c_client, "c_name" = EXCLUDED.c_name, 
 		"spec_typ" = EXCLUDED.spec_typ, "spec_doc" = EXCLUDED.spec_doc, "spec_date" = EXCLUDED.spec_date, "date_rez" = EXCLUDED.date_rez, 
 		"spec_stage" = EXCLUDED.spec_stage, "spec_stage5" = EXCLUDED.spec_stage5, "st" = EXCLUDED.st, "p_modi" = EXCLUDED.p_modi, "d_modi" = EXCLUDED.d_modi;
+--удаляю обработанные строки из оракл		
+DELETE FROM ora_replog999 WHERE "N_TABLE" = 'PERS_SPEC' AND "R_TABLE" = '%s';
+END;
+$$ LANGUAGE plpgsql;

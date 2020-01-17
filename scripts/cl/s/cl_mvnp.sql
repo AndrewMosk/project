@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_mvnp ("c_client", "np", "p_modi", "d_modi")

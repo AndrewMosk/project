@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_okved ("r", "c_client", "shifr", "p_modi", "d_modi")
