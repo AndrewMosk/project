@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
-public class Replication{
+public class Replication {
     private Statement stmt;
-    private Map<String , ArrayList<String>> states;
+    private Map<String, ArrayList<String>> states;
     private Mail mail;
 
     public Replication() {
@@ -17,8 +17,43 @@ public class Replication{
         this.mail = new Mail();
     }
 
+    private boolean deleteRows(StringBuilder sqlQuery, String table) throws SQLException {
+        String errorSql;
+        try {
+            stmt.executeUpdate(sqlQuery.toString());
+        } catch (SQLException e) {
+            // если ошибка связана с транзакционностью вызываю метод удаления еще раз
+            if (transactionError(e.getMessage())) {
+                return true;
+            } else {
+                // если какая-то другая ошибка (синтаксис или скажем неверный порядок вызова скрипта удаления) тогда запись в лог ошибок и перехол к следующему
+                errorSql = Utils.insertToErrorLog("D", table, e.getMessage().replace("'", ""));
+                stmt.executeUpdate(errorSql);
+            }
+        }
+
+        return false;
+    }
+
     public void startReplication() throws SQLException, IOException {
         System.out.println("start replication");
+        // удаление данных
+        String[][] tablesArrayD = Utils.getTablesOperationD();
+        for (String[] tables : tablesArrayD) {
+            String dir = tables[0];
+
+            for (int i = 1; i < tables.length; i++) {
+                StringBuilder sqlQuery = new StringBuilder(Utils.readSqlQuery("scripts/" + dir + "/d/" + tables[i].toLowerCase() + ".sql"));
+
+                boolean fail = true;
+                while (fail) {
+                    fail = deleteRows(sqlQuery, tables[i]);
+                }
+            }
+
+        }
+
+        // добавление/изменение данных
         String[][] tablesArray = Utils.getTables();
         boolean loadSuccessful;
 
@@ -38,7 +73,7 @@ public class Replication{
                     if (!loadSuccessful) {
                         break;
                     }
-                }else {
+                } else {
                     lineByLineLoad(dir, tables[i]);
                 }
             }
@@ -59,7 +94,7 @@ public class Replication{
             while (rs.next()) {
                 if (startsWithStar) {
                     listUpdateInsert.add("'" + rs.getString("r_table") + "'");
-                }else {
+                } else {
                     listUpdateInsert.add(rs.getString("r_table"));
                 }
             }
@@ -76,11 +111,11 @@ public class Replication{
 
         // получаю список кодов по текущей таблице
         ArrayList<String> listUpdateInsert = states.get(table);
-        table = table.replace("*","");
+        table = table.replace("*", "");
 
         // задаю лимит на загрузку
         int limit = 1000;
-        int numberIterations = (int)Math.ceil(listUpdateInsert.size()/(double)limit);
+        int numberIterations = (int) Math.ceil(listUpdateInsert.size() / (double) limit);
         //подгружаю текст sql запроса
         String sqlQuery = Utils.readSqlQuery("scripts/" + dir + "/s/" + table.toLowerCase() + ".sql");
         String sql;
@@ -107,7 +142,7 @@ public class Replication{
                     sql = String.format(sqlQuery, listToString, listToString);
                 }
                 stmt.executeUpdate(sql);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 if (dir.equals(table.toLowerCase())) {
                     // ошибка в загрузке родительской таблицы - прерывание цикла загрузки подчиненных и оповещение на email
                     mail.send("Ошибка загрузки таблицы " + table, e.getMessage());
@@ -137,7 +172,7 @@ public class Replication{
         String sql;
         String errorSql;
         int counter = 0;
-        for (String code: listUpdateInsert) {
+        for (String code : listUpdateInsert) {
             // построчная обработка данных
             try {
                 // инсерт/апдейт строки в базу и удаление из replog
@@ -147,7 +182,7 @@ public class Replication{
                 // проверяю, что не содержит коды ошибок связанных транзакциями
                 if (!transactionError(e.getMessage())) {
                     // запись в БД информации об ошибке
-                    errorSql = Utils.insertToErrorLog(code, currentTable, e.getMessage().replace("'",""));
+                    errorSql = Utils.insertToErrorLog(code, currentTable, e.getMessage().replace("'", ""));
 
                     stmt.executeUpdate(errorSql);
                 }
