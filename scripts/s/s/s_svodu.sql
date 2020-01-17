@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_svodu ("r", "cz_cod", "czu_cod", "godr", "mesr", "godv", "mesv", "period", "periodk", "nu_cod", "nun_cod", "sumu", "kolu", "p_modi", "d_modi")

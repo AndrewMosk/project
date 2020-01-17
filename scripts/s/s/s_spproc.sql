@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_spproc ("proc_cod", "proc_name", "proc")

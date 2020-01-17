@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_zvspis ("r", "r_zv", "prof_cod", "pd_cod", "salary", "oksm_cod", "date_b", "date_e", "prim", "k_prof", "p_prof_ok", "p_prof_no", "z_prof_ok", "z_prof_no", "p_no", 

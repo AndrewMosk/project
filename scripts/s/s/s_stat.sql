@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_stat ("r", "godr", "mesr", "cz_cod", "sumo", "k_pers", "k_new", "k_bak", "k_min", "k_max", "k_minr", "k_maxr", "k_mat", "k_educ", "k_poor", "k_perspoor", "s_poor",

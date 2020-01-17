@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_fil ("otd_cod", "fil_cod", "fil_name", "adress", "bak", "pr", "p_modi", "d_modi")

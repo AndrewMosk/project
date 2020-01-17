@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_aperiodm ("r_p", "godr", "mesr", "period", "periodk", "cz_cod", "date_b", "date_e", "d_oper", "p_modi", "d_modi")

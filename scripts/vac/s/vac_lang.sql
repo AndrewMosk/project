@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_lang ("r", "vac_num", "lang_cod", "lang_level", "p_modi", "d_modi", "p_ins", "d_ins")

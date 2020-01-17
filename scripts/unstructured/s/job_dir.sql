@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	job_dir ("dir_num", "reg_num", "vac_num", "dir_spr", "fin_way", "give_date", "fin_date", "rez_det",  "c_client",  "prof_cod",  "salary",  "plc_cod", "agr_cod", 

@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_fair_def ("r", "r_fair", "def_cod", "p_modi", "d_modi")

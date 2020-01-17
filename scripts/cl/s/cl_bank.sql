@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_bank ("r", "c_client", "bnk_code", "bnk_acc", "bnk_sub", "d_open", "d_close", "tp_acc", "b_registr", "p_modi", "d_modi")

@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_spnu ("nu_cod", "nu_name", "pr", "pol_cod", "cod_l")

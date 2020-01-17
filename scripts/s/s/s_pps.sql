@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_pps ("r", "pp_cod", "pp_date", "plc_cod", "otd_cod", "sumv", "sumd", "kolv", "kold", "summ", "kolm", "sumbs", "godr", "mesr", "period", "periodk", "sp_num", 

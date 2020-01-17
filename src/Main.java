@@ -1,10 +1,11 @@
 import service.Database;
 import service.Mail;
+
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main {
-    public static void main(String[] args)  {
-
+    public static void main(String[] args) {
         long starTime = System.currentTimeMillis();
 
         try {
@@ -13,30 +14,13 @@ public class Main {
             Replication replication = new Replication();
             replication.startReplication();
 
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();
             Mail mail = new Mail();
             mail.send("Ошибка старта репликации", e.getMessage());
         }
         Database.close();
 
-        System.out.println((System.currentTimeMillis() - starTime)/1000);
-
-        // вроде все ошибки пофиксил - запускаю тестовую загрузку CL и подчиненных
-        // посмотрю сколько будет без родителя
-        //-----------------------------------------------------------------------------
-        // такое чувство, что скрипт вставки пачкой работает неправильно!
-        // удаляет из реплога исправно, а вот в postgre не пишет! хотя как он может и не писать и не падать по ошибке?
-        // был косяк если пачка была на столько большая, что приходилось разбивать ее на несколько штук (по 100 000)
-        // в этом случае я не учитывал, что переменной sql вместо знака параметра (%s) уже присвоился какой-то массив значений и в след раз присвоения следующего массива не происходило
-
-
-        // взять код cl из ошибки cl_address  и прям константой забить в скрипт и посмотреть - загрузится или нет - загрузилось нормально
-
-        // плюс в построчной загрузке ошибка в логике обработки ошибок
-        // не ошибка в логике, а почему-то строковая константа описания ошибки вызывает ошибку инсерта - разобараться
-        // Разобрался - мешали одинарные кавычки
-
-        // переделать константу sql - тоже построчная загрузка
+        System.out.println((System.currentTimeMillis() - starTime) / 1000);
     }
 }

@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_adep ("r", "reg_num", "sp_num", "godrd", "mesrd", "r_pd", "periodd", "spd_cod", "spd_date", "cz_cod", "godr", "mesr", "r_p", "period", "nun_cod", "sumd", 

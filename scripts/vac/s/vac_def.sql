@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_def ("r", "vac_num", "def_cod", "p_modi", "d_modi", "p_ins", "d_ins")

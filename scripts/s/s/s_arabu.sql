@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_arabu ("r", "godr", "mesr", "reg_num", "godv", "mesv", "nu_cod", "nun_cod", "r_d", "doc_num", "dnin", "sumn", "proc", "sumu", "sumud", "dnid", "dnip", "sump", 

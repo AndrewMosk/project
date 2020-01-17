@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_pspis ("r", "r_p", "year", "kv", "kv_date", "r1", r2, "r3", "r4", "r5", "r6", "ri1", "ri2", "ri3", "ri4", "ri5", "ri6", "p_modi", "d_modi")

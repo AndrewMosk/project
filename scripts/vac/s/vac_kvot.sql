@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_kvot ("pac_num", "typz", "c_client", "year", "month", "add_date", "send_date", "in_date", "note", "del_date", "emp_count", "empv_count", "kv_proc", 

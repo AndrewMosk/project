@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_history ("r", "vac_num", "acs_date", "acs_cod", "cod_cond_a", "cod_cond_b", "reg_num", "c_contact", "cz_cod", "cont_comm", "p_modi", "d_modi")

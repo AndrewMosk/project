@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_rabdu ("r", "reg_num", "nu_cod", "doc_num", "priz_pol", "c_client", "pol_cod", "c_bank", "sch_num", "date_b", "date_e", "dnid", "sumd", "dnip", "sump", "procu", 

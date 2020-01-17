@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_aspis ("sp_cod", "sp_form", "cz_cod", "k_priz", "nun_cod", "sumv", "kolv", "fil_cod", "otd_cod", "pbo_bank", "godr", "mesr", "r_p", "period", "pp_cod", 

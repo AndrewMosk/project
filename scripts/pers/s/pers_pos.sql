@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	pers_pos ("reg_num", "date_p", "date_n", "pers_num", "date_rezp", "date_prof", "pers_prof", "date_rezc", "date_comj", "pers_comj", "p_modi", "d_modi")

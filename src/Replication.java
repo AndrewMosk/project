@@ -1,6 +1,8 @@
 import service.Database;
 import service.Mail;
 import service.Utils;
+
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
@@ -15,22 +17,10 @@ public class Replication{
         this.mail = new Mail();
     }
 
-    public void startReplication() throws SQLException {
+    public void startReplication() throws SQLException, IOException {
         System.out.println("start replication");
         String[][] tablesArray = Utils.getTables();
         boolean loadSuccessful;
-        //String mainTable;
-        //boolean mainTableDownloaded = true;
-
-        // алгоритм требует имзменения
-        // пачкой буду загружать не только родительские таблицы, но и неструктурированные и S
-        // как тогда будет выглядеть алгоритм?
-        // как вариант - просто добавить звездочку * в начало строки, которую нужно грузить пачкой
-
-        // осталось учесть следующее - ошибка в packageLoad родительской таблице должна прерывать весь цикл загрузки текущего массива таблиц, а в в случае загрузки неструктурированных таблиц
-        // или S просто переходить на следующую. даже не на следующую таблицу, а на следующую пачку! если, к примеру, грузится миллион по 100 тысяч
-        // думаю, сделать так: если нулевой элемент массива равен привдененному к нижнему регистру и лишенному звездочки второму элементу (например "cl" и "*CL") - равны, значит
-        // "*CL" - родительская таблица и ошибка в ее загрузке завершает цикл. если же "s" не равн "*S_ADEP"
 
         for (String[] tables : tablesArray) {
             String dir = tables[0];
@@ -78,7 +68,7 @@ public class Replication{
         }
     }
 
-    private boolean packageLoad(String dir, String table) throws SQLException {
+    private boolean packageLoad(String dir, String table) throws SQLException, IOException {
         System.out.println("start packageLoad " + table);
         // на сколько я понимаю, здесь манипуляции с коммитом тоже не нужны. по умолчанию автокоммит = истина, т.е. после каждого апдейта
         // изменения сохраняются в БД, ну а в случае ошибки во время выполнения инсерта/апдейта происходит откат и ничего не записывается, так что комментирую
@@ -89,7 +79,7 @@ public class Replication{
         table = table.replace("*","");
 
         // задаю лимит на загрузку
-        int limit = 100000;
+        int limit = 1000;
         int numberIterations = (int)Math.ceil(listUpdateInsert.size()/(double)limit);
         //подгружаю текст sql запроса
         String sqlQuery = Utils.readSqlQuery("scripts/" + dir + "/s/" + table.toLowerCase() + ".sql");
@@ -110,7 +100,7 @@ public class Replication{
                 listToString = listUpdateInsertLimited.toString();
                 listToString = Utils.changeBrackets(listToString);
 
-                if (table.equals("PERS")) {
+                if (table.equals("PERS") || table.equals("PERS_DOP")) {
                     // в скрипте PERS параметр нужно задать трижды
                     sql = String.format(sqlQuery, listToString, listToString, listToString);
                 } else {
@@ -138,7 +128,7 @@ public class Replication{
         return true;
     }
 
-    private void lineByLineLoad(String dir, String currentTable) throws SQLException {
+    private void lineByLineLoad(String dir, String currentTable) throws SQLException, IOException {
         System.out.println("start lineByLineLoad " + currentTable);
         // получаю список кодов по текущей таблице
         ArrayList<String> listUpdateInsert = states.get(currentTable);
@@ -146,6 +136,7 @@ public class Replication{
         String sqlQuery = Utils.readSqlQuery("scripts/" + dir + "/s/" + currentTable.toLowerCase() + ".sql");
         String sql;
         String errorSql;
+        int counter = 0;
         for (String code: listUpdateInsert) {
             // построчная обработка данных
             try {
@@ -161,11 +152,13 @@ public class Replication{
                     stmt.executeUpdate(errorSql);
                 }
             }
+            counter++;
         }
         System.out.println("finish lineByLineLoad " + currentTable);
     }
 
     private boolean transactionError(String message) {
+        // перенести в Utils
         boolean result = false;
 
         if ((message.contains("08177") || message.contains("01555"))) {

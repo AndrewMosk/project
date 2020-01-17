@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	pers_prof ("r", "reg_num", "prof_cod", "pd_cod", "prof_lev", "prof_spec", "prof_comm", "date_begin", "date_end", "prof_stage", "prof_doc", "pr", "p_modi", "d_modi")

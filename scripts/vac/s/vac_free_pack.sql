@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_free_pack ("pac_num", "typz", "status", "c_client", "year", "month", "add_date", "send_date", "in_date", "del_date", "emp_count", "empi_count", "start_free", 

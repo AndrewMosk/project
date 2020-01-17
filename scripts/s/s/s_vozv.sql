@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_vozv ("r", "reg_num", "r_p", "nu_cod", "v_cod", "v_doc", "v_date", "v_sum", "p_modi", "d_modi")

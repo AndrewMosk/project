@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_kvot_rm ("r", "pac_num", "prof_cod", "pd_cod", "prof_spec", "prof_lev", "educ_cod", "kv_rm", "salary", "notedoc", "noteprof", "p_modi", "d_modi")

@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_otd ("otd_cod", "c_client", "c_bank", "sch_num", "plc_cod", "ind1", "ind2", "bak", "pr", "p_modi", "d_modi")

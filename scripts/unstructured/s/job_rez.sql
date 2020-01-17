@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	job_rez ("r_rez", "reg_num", "dir_num", "job_in_type", "c_client", "prof_cod", "pd_cod", "salf_cod", "jchar_cod", "jreg_cod", "salary", "spe_cod", "rez_date" , 

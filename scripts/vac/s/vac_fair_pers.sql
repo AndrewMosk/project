@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_fair_pers ("r", "r_fair", "reg_num", "pfakt", "date_rezu", "date_rez", "p_modi", "d_modi")

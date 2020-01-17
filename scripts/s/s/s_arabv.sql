@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_arabv ("r", "reg_num", "sumv", "nu_cod", "nun_cod", "sp_cod", "pp_date", "godr", "mesr", "period", "r_p", "p_modi", "d_modi")

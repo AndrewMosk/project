@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	pers_pcl ("r", "reg_num", "pcl_cod", "p_modi", "d_modi")

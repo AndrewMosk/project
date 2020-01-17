@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_agr ("vac_num", "type_cod", "in_date", "cz_cod", "c_client", "c_contact", "prof_cod", "pd_cod", "prof_lev", "prof_spec", "are_cod", "jreg_cod", "job_time", 

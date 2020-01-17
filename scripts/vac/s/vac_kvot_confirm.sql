@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	vac_kvot_confirm ("r", "pac_num", "kv_rm", "title", "docdate", "docnumber", "p_modi", "d_modi")

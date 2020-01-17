@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_contact ("c_contact", "c_client", "cntct_f", "cntct_i", "cntct_o", "dlg_cod", "pd_cod", "dlg_name", "tlf_no", "ext_number", "tlf_dop", "fax_number", "e_mail", 

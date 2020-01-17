@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_fpers ("pol_cod", "pol_name", "pol_names", "vid", "ind", "adres", "otd_cod", "fil_cod", "sch_num", "spis", "proc", "bak", "pr", "cz_cod", "p_modi", "d_modi")

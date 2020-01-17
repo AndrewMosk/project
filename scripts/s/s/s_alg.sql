@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	s_alg ("r", "reg_num", "nu_cod", "datb1", "date1", "proc1", "sumb1", "sums1", "datb2", "date2", "proc2", "sumb2", "sums2", "datb3", "date3", "proc3", "sumb3", 

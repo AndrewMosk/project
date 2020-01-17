@@ -1,4 +1,4 @@
-﻿DO $$
+DO $$
 BEGIN
 INSERT INTO
 	cl_mvpers ("r", "r_mv", "r_mvrab", "c_client", "cz_cod", "fio", "prof_cod", "date_f", "pdubl", "pz", "reg_num", "reg_date", "trud_date", "sod_date", "pens_date", 
