@@ -37,7 +37,7 @@ public class Replication {
 
     public void startReplication() throws SQLException, IOException {
         System.out.println("start replication");
-        // удаление данных
+        //удаление данных
         String[][] tablesArrayD = Utils.getTablesOperationD();
         for (String[] tables : tablesArrayD) {
             String dir = tables[0];
@@ -47,13 +47,14 @@ public class Replication {
 
                 boolean fail = true;
                 while (fail) {
+                    System.out.println("Deleting table " + tables[i]);
                     fail = deleteRows(sqlQuery, tables[i]);
                 }
             }
 
         }
 
-        // добавление/изменение данных
+//        // добавление/изменение данных
         String[][] tablesArray = Utils.getTables();
         boolean loadSuccessful;
 
