@@ -32,16 +32,16 @@ public class Replication {
         this.mail = new Mail();
     }
 
-    private LoadResult deleteRows(StringBuilder sqlQuery, String table) throws SQLException {
-        LoadResult loadResult = new LoadResult();
+    private boolean deleteRows(StringBuilder sqlQuery, String table) throws SQLException {
+        //LoadResult loadResult = new LoadResult();
         String errorSql;
         try {
             stmt.executeUpdate(sqlQuery.toString());
         } catch (SQLException e) {
             // если ошибка связана с транзакционностью вызываю метод удаления еще раз
             if (Utils.transactionError(e.getMessage())) {
-                loadResult.continueLoad = true;
-                return loadResult;
+                //loadResult.continueLoad = true;
+                return true;
             } else {
                 // если какая-то другая ошибка (синтаксис или скажем неверный порядок вызова скрипта удаления) тогда запись в лог ошибок и переход к следующему
                 errorSql = Utils.insertToErrorLog("D", table, e.getMessage().replace("'", ""));
@@ -49,75 +49,86 @@ public class Replication {
             }
         }
 
-        return loadResult;
+        return false;
     }
 
     public void startReplication() throws SQLException, IOException {
-        // !!!РАЗОБРАТЬСЯ С НЕСТРУКТУРИРОВАННЫМИ!!!
 //        -----------------------------------------------------------------
-        lineByLineLoad("vac", "VAC_KVOT_RM");
-
+//        lineByLineLoad("vac", "VAC_KVOT_RM");
 //        -----------------------------------------------------------------
 
-//        System.out.println("start replication");
-//        //удаление данных
-//        String[][] tablesArrayD = Utils.getTablesOperationD();
-//        for (String[] tables : tablesArrayD) {
-//            String dir = tables[0];
-//
-//            for (int i = 1; i < tables.length; i++) {
-//                StringBuilder sqlQuery = new StringBuilder(Utils.readSqlQuery("scripts/" + dir + "/d/" + tables[i].toLowerCase() + ".sql"));
-//
-//                boolean continueLoad = true;
-//                while (continueLoad) {
-//                    System.out.println("Deleting table " + tables[i]);
-//                    continueLoad = deleteRows(sqlQuery, tables[i]).continueLoad;
-//                }
-//            }
-//
-//        }
-//
-////        // добавление/изменение данных
-//        String[][] tablesArray = Utils.getTables();
-//        boolean loadSuccessful;
-//
-//        for (String[] tables : tablesArray) {
-//            String dir = tables[0];
-//
-//            // подгружаю все данные на обмен по текущим таблицам
-//            uploadDataForReplication(tables);
-//
-//            for (int i = 1; i < tables.length; i++) {
-//
-//                if (tables[i].startsWith("*")) {
-//                    loadSuccessful = packageLoad(dir, tables[i]);
-//
-//                    // loadSuccessful ложь только в том случае, когда произошлоа ошибка загрузки родительской таблицы
-//                    // в этом случае загрузку таблиц-наследников тоже прерываю и перехожу к следующему блоку таблиц
-//                    if (!loadSuccessful) {
-//                        break;
-//                    }
-//                } else {
-//                    System.out.println("start lineByLineLoad " + tables[i]);
-//
-//                    lineByLineLoad(dir, tables[i], loadResult);
-//
-//                    System.out.println("finish lineByLineLoad " + tables[i]);
-//                }
-//            }
-//        }
+        System.out.println("start replication");
+        //удаление данных
+        String[][] tablesArrayD = Utils.getTablesOperationD();
+        boolean continueLoad;
+        for (String[] tables : tablesArrayD) {
+            String dir = tables[0];
+
+            for (int i = 1; i < tables.length; i++) {
+                StringBuilder sqlQuery = new StringBuilder(Utils.readSqlQuery("scripts/" + dir + "/d/" + tables[i].toLowerCase() + ".sql"));
+                continueLoad = true;
+
+                while (continueLoad) {
+                    System.out.println("Deleting table " + tables[i]);
+                    continueLoad = deleteRows(sqlQuery, tables[i]);
+                }
+            }
+        }
+
+        // добавление/изменение данных
+        String[][] tablesArray = Utils.getTables();
+        boolean loadSuccessful;
+
+        for (String[] tables : tablesArray) {
+            String dir = tables[0];
+
+            // подгружаю все данные на обмен по текущим таблицам
+            uploadDataForReplication(tables);
+
+            for (int i = 1; i < tables.length; i++) {
+
+                if (tables[i].startsWith("*")) {
+                    loadSuccessful = packageLoad(dir, tables[i]);
+
+                    // loadSuccessful ложь только в том случае, когда произошла ошибка загрузки родительской таблицы
+                    // в этом случае загрузку таблиц-наследников тоже прерываю и перехожу к следующему блоку таблиц
+                    if (!loadSuccessful) {
+                        break;
+                    }
+                } else {
+                    System.out.println("start lineByLineLoad " + tables[i]);
+
+                    lineByLineLoad(dir, tables[i]);
+
+                    System.out.println("finish lineByLineLoad " + tables[i]);
+                }
+            }
+        }
     }
 
-    private void uploadDataForReplication(String[] tables) throws SQLException {
+    private void uploadDataForReplication(String[] tables) {
         states.clear();
         String sql;
+        boolean continueLoad;
 
         for (int i = 1; i < tables.length; i++) {
+            continueLoad = true;
             sql = Utils.getReplicationLog(tables[i].replace("*", ""), "S");
 
-            ResultSet rs = stmt.executeQuery(sql);
-            ArrayList<String> listUpdateInsert = new ArrayList<>();
-            boolean startsWithStar = tables[i].startsWith("*");
+            while (continueLoad) {
+                continueLoad = loadCurrentTable(sql, tables[i]);
+            }
+
+        }
+    }
+
+    private boolean loadCurrentTable(String sql, String table) {
+        ArrayList<String> listUpdateInsert = new ArrayList<>();
+        ResultSet rs;
+        boolean startsWithStar;
+        try {
+            rs = stmt.executeQuery(sql);
+            startsWithStar = table.startsWith("*");
 
             while (rs.next()) {
                 if (startsWithStar) {
@@ -126,16 +137,21 @@ public class Replication {
                     listUpdateInsert.add(rs.getString("r_table"));
                 }
             }
-
-            states.put(tables[i], listUpdateInsert);
+        } catch (SQLException e) {
+            // здесь могут быть только два типа ошибок - либо транзакционная либо нарушена связь с БД. первый случай - загружаю еще раз, второй - выход из программы и оповещение на email.
+            if (Utils.transactionError(e.getMessage())) {
+                return true;
+            }
         }
+
+        states.put(table, listUpdateInsert);
+        return false;
     }
 
     private boolean packageLoad(String dir, String table) throws SQLException, IOException {
         System.out.println("start packageLoad " + table);
-        // на сколько я понимаю, здесь манипуляции с коммитом тоже не нужны. по умолчанию автокоммит = истина, т.е. после каждого апдейта
-        // изменения сохраняются в БД, ну а в случае ошибки во время выполнения инсерта/апдейта происходит откат и ничего не записывается, так что комментирую
         String errorSql;
+        boolean continueLoad;
 
         // получаю список кодов по текущей таблице
         ArrayList<String> listUpdateInsert = states.get(table);
@@ -151,26 +167,30 @@ public class Replication {
 
         List<String> listUpdateInsertLimited;
         for (int i = 0; i < numberIterations; i++) {
+            int upperLimit = (i + 1) * limit;
+
+            if (upperLimit > listUpdateInsert.size()) {
+                upperLimit = listUpdateInsert.size();
+            }
+
+            listUpdateInsertLimited = listUpdateInsert.subList(i * limit, upperLimit);
+
+            listToString = listUpdateInsertLimited.toString();
+            listToString = Utils.changeBrackets(listToString);
+
+            if (table.equals("PERS") || table.equals("PERS_DOP")) {
+                // в скрипте PERS параметр нужно задать трижды
+                sql = String.format(sqlQuery, listToString, listToString, listToString);
+            } else {
+                sql = String.format(sqlQuery, listToString, listToString);
+            }
+
+            continueLoad = true;
             try {
-                int upperLimit = (i + 1) * limit;
-
-                if (upperLimit > listUpdateInsert.size()) {
-                    upperLimit = listUpdateInsert.size();
+                while (continueLoad) {
+                    continueLoad = loadPack(sql);
                 }
-
-                listUpdateInsertLimited = listUpdateInsert.subList(i * limit, upperLimit);
-
-                listToString = listUpdateInsertLimited.toString();
-                listToString = Utils.changeBrackets(listToString);
-
-                if (table.equals("PERS") || table.equals("PERS_DOP")) {
-                    // в скрипте PERS параметр нужно задать трижды
-                    sql = String.format(sqlQuery, listToString, listToString, listToString);
-                } else {
-                    sql = String.format(sqlQuery, listToString, listToString);
-                }
-                stmt.executeUpdate(sql);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 if (dir.equals(table.toLowerCase())) {
                     // ошибка в загрузке родительской таблицы - прерывание цикла загрузки подчиненных и оповещение на email
                     mail.send("Ошибка загрузки таблицы " + table, e.getMessage());
@@ -178,29 +198,39 @@ public class Replication {
                     return false;
                 }
 
-                // если ошибка не связана с блокировкой транзакций, тогда записываю ее в лог ошибок и продолжаю загрузку
-                if (!Utils.transactionError(e.getMessage())) {
-                    // запись в БД информации об ошибке
-                    errorSql = Utils.insertToErrorLog("", table, e.getMessage());
-
-                    stmt.executeUpdate(errorSql);
-                }
+                // запись в БД информации об ошибке
+                errorSql = Utils.insertToErrorLog("", table, e.getMessage());
+                stmt.executeUpdate(errorSql);
             }
         }
         System.out.println("finish packageLoad " + table);
         return true;
     }
 
+    private boolean loadPack(String sql) throws RuntimeException {
+        try {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            if (Utils.transactionError(e.getMessage())) {
+                return true;
+            } else {
+                // если ошибка не транзакционного характера, бросаю исключение и прекращаю загрузку таблицы и ее дочерних
+                throw new RuntimeException();
+            }
+        }
+        return false;
+    }
+
     private void lineByLineLoad(String dir, String currentTable) throws SQLException, IOException {
         LoadResult loadResult = new LoadResult();
 
         // получаю список кодов по текущей таблице
-        //ArrayList<String> listUpdateInsert = states.get(currentTable);
+        ArrayList<String> listUpdateInsert = states.get(currentTable);
 //        -----------------------------------------------------------------
-        ArrayList<String> listUpdateInsert = new ArrayList<>();
-        listUpdateInsert.add("2130022706"); // нет
-        listUpdateInsert.add("2130022705"); // нет
-        listUpdateInsert.add("9910363515"); // есть в ора, нет в постгри
+//        ArrayList<String> listUpdateInsert = new ArrayList<>();
+//        listUpdateInsert.add("2130022706"); // нет
+//        listUpdateInsert.add("2130022705"); // нет
+//        listUpdateInsert.add("9910363515"); // есть в ора, нет в постгри
 //        -----------------------------------------------------------------
 
         //подгружаю общий текст sql запроса
@@ -253,9 +283,7 @@ public class Replication {
 
             // удаление из реплога
             stmt.executeUpdate(Utils.deleteFromOraReplog(currentTable, code));
-
         }
-
         loadResult.continueLoad = false;
     }
 }

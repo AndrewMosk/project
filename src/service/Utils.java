@@ -61,7 +61,7 @@ public class Utils {
     public static String generateLoadOwnerSql(String error) throws IOException {
         ErrorData errorData = parseError(error);
 
-        // имена всех таблиц, имеют префик, совпадающий с именем папки, в которой они хранятся - кроме неструктурированных! - может им добавить?
+        // имена всех таблиц, имеют префикс, совпадающий с именем папки, в которой они хранятся - кроме неструктурированных! - может им добавить?
         String folderName = errorData.n_table.split("_")[0];
 
         String dir = "scripts/" + folderName + "/s/" + errorData.n_table + ".sql";
