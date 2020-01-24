@@ -13,8 +13,12 @@ public class Main {
         try {
             Database.connect();
 
-            Replication replication = new Replication();
-            replication.startReplication();
+            ErrorHandling errorHandling = new ErrorHandling("PERS_REZDOC");
+            errorHandling.tryFixErrors();
+
+
+//            Replication replication = new Replication();
+//            replication.startReplication();
 
         } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();

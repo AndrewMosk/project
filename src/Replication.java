@@ -58,7 +58,7 @@ public class Replication {
 //        -----------------------------------------------------------------
 
         System.out.println("start replication");
-        //удаление данных
+//        //удаление данных
         String[][] tablesArrayD = Utils.getTablesOperationD();
         boolean continueLoad;
         for (String[] tables : tablesArrayD) {
@@ -273,6 +273,9 @@ public class Replication {
                     // ставлю флаг истина, что попытка загрузки владельца состоялась и отправляю строку наследника на загрузку еще раз
                     loadResult.attemptLoadOwner = true;
                     return;
+                } else {
+                    // попытка загрузки владельца была, но ошибка осталась - удаление из реплога
+                    stmt.executeUpdate(Utils.deleteFromOraReplog(currentTable, code));
                 }
             }
 
@@ -280,9 +283,6 @@ public class Replication {
             // записываю ее в лог ошибок и перехожу к следующей строке
             errorSql = Utils.insertToErrorLog(code, currentTable, e.getMessage().replace("'", ""));
             stmt.executeUpdate(errorSql);
-
-            // удаление из реплога
-            stmt.executeUpdate(Utils.deleteFromOraReplog(currentTable, code));
         }
         loadResult.continueLoad = false;
     }
