@@ -12,38 +12,45 @@ public class Test {
 
     private static Statement stmt;
 
+    private static boolean isUnstructured(String n_table) {
+        return "CONS, JOB_DIR, JOB_REZ, RK_LIST, RK_REZ".contains(n_table);
+    }
+
     public static void main(String[] args) throws IOException {
-        String initialSql = "";
-        stmt = Database.getStmt();
+        System.out.println(isUnstructured("JOB_DIR"));
 
-        // взял первый пример сразу удачно - PERS_CLOSE - там ссылка на sl_pers - у меня таких не создано!  нужно добавить!!!
 
-        String error = "ERROR: insert or update on table \"pers_rezdoc\" violates foreign key constraint \"pers_rezdoc_fk\"\n" +
-                "  Подробности: Key (r_rez)=(1805797767) is not present in table \"pers_rez\".\n" +
-                "  Где: SQL statement \"INSERT INTO\n" +
-                "\tpers_rezdoc (\"r\", \"r_rez\", \"c_order\", \"hex\", \"status\", \"p_modi\", \"d_modi\")\n" +
-                "SELECT \"r\", \"r_rez\", \"c_order\", \"hex\", \"status\", \"p_modi\", \"d_modi\"\n" +
-                "FROM ora_pers_rezdoc WHERE ora_pers_rezdoc.r = 1805797767_18\n" +
-                "ON CONFLICT (\"r\") DO UPDATE SET \"r_rez\" = EXCLUDED.r_rez, \"c_order\" = EXCLUDED.c_order, \"hex\" = EXCLUDED.hex, \"status\" = EXCLUDED.status, \n" +
-                "\t\t\"p_modi\" = EXCLUDED.p_modi, \"d_modi\" = EXCLUDED.d_modi\"\n" +
-                "PL/pgSQL function inline_code_block line 3 at SQL statement";
-
-        if (error.contains("violates foreign key constraint")) {
-//            String[] errorData = parseError(error);
-//            String sql = generateSql(errorData[0], errorData[1]);
-            String sql = generateSql(error);
-
-//            try {
-//                stmt.executeUpdate(sql);
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//                // нужен текст ошибки, что в оракловой таблице нет такого ключа - а ошибки то и не будет! значит возможна ошибка транзакционности, если она - запускаю еще раз, если нет, пробую еще раз
-//                //скрипт, который упал по ошибке. если снова ошибка - пропускаю и удаляю из реплога - сука! костыль на костыле (
+//        String initialSql = "";
+//        stmt = Database.getStmt();
 //
-//            }
-
-            System.out.println(sql);
-        }
+//        // взял первый пример сразу удачно - PERS_CLOSE - там ссылка на sl_pers - у меня таких не создано!  нужно добавить!!!
+//
+//        String error = "ERROR: insert or update on table \"pers_rezdoc\" violates foreign key constraint \"pers_rezdoc_fk\"\n" +
+//                "  Подробности: Key (r_rez)=(1805797767) is not present in table \"pers_rez\".\n" +
+//                "  Где: SQL statement \"INSERT INTO\n" +
+//                "\tpers_rezdoc (\"r\", \"r_rez\", \"c_order\", \"hex\", \"status\", \"p_modi\", \"d_modi\")\n" +
+//                "SELECT \"r\", \"r_rez\", \"c_order\", \"hex\", \"status\", \"p_modi\", \"d_modi\"\n" +
+//                "FROM ora_pers_rezdoc WHERE ora_pers_rezdoc.r = 1805797767_18\n" +
+//                "ON CONFLICT (\"r\") DO UPDATE SET \"r_rez\" = EXCLUDED.r_rez, \"c_order\" = EXCLUDED.c_order, \"hex\" = EXCLUDED.hex, \"status\" = EXCLUDED.status, \n" +
+//                "\t\t\"p_modi\" = EXCLUDED.p_modi, \"d_modi\" = EXCLUDED.d_modi\"\n" +
+//                "PL/pgSQL function inline_code_block line 3 at SQL statement";
+//
+//        if (error.contains("violates foreign key constraint")) {
+////            String[] errorData = parseError(error);
+////            String sql = generateSql(errorData[0], errorData[1]);
+//            String sql = generateSql(error);
+//
+////            try {
+////                stmt.executeUpdate(sql);
+////            } catch (SQLException e) {
+////                e.printStackTrace();
+////                // нужен текст ошибки, что в оракловой таблице нет такого ключа - а ошибки то и не будет! значит возможна ошибка транзакционности, если она - запускаю еще раз, если нет, пробую еще раз
+////                //скрипт, который упал по ошибке. если снова ошибка - пропускаю и удаляю из реплога - сука! костыль на костыле (
+////
+////            }
+//
+//            System.out.println(sql);
+//        }
 
     }
 
