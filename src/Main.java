@@ -13,7 +13,7 @@ public class Main {
         try {
             Database.connect();
 
-            ErrorHandling errorHandling = new ErrorHandling("PERS_REZDOC");
+            ErrorHandling errorHandling = new ErrorHandling();
             errorHandling.tryFixErrors();
 
 
