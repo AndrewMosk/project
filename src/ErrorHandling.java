@@ -46,7 +46,7 @@ public class ErrorHandling {
         return n_tables;
     }
 
-    private int tryToFix(String sqlQuery, ArrayList<String> errorCodes, String n_table) {
+    private int tryToFix(String sqlQuery, ArrayList<String> errorCodes, String n_table) throws SQLException {
         String string;
         String string1;
         int counter = 0;
@@ -69,6 +69,8 @@ public class ErrorHandling {
                         counter++;
                     } catch (IOException | SQLException ex) {
                         System.out.println("Таблица " + n_table + ". Ошибка не исправлена. Код строки: " + errorCode);
+                        String s = "UPDATE error_repl_log SET checked = true WHERE \"table\" = '" + n_table + "' AND r = '" + errorCode + "'";
+                        stmt.executeUpdate(s);
                     }
                 }
             }
@@ -104,7 +106,7 @@ public class ErrorHandling {
     }
 
     private String getSqlQueryError(String n_table) {
-        return String.format("SELECT r FROM error_repl_log WHERE \"table\" = '%s'", n_table);
+        return String.format("SELECT r FROM error_repl_log WHERE \"table\" = '%s' AND checked = false", n_table);
     }
 
     private String getSqlRemoveFromErrorLog(String code, String n_table) {
@@ -112,6 +114,6 @@ public class ErrorHandling {
     }
 
     private String getSqlQueryN_tables() {
-        return "SELECT \"table\" as s FROM error_repl_log WHERE r != 'D' GROUP BY \"table\"";
+        return "SELECT \"table\" as s FROM error_repl_log WHERE r != 'D' AND checked = false GROUP BY \"table\"";
     }
 }

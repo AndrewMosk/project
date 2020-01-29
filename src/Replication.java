@@ -190,7 +190,7 @@ public class Replication {
                 while (continueLoad) {
                     continueLoad = loadPack(sql);
                 }
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 if (dir.equals(table.toLowerCase())) {
                     // ошибка в загрузке родительской таблицы - прерывание цикла загрузки подчиненных и оповещение на email
                     mail.send("Ошибка загрузки таблицы " + table, e.getMessage());

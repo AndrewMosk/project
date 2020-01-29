@@ -13,12 +13,12 @@ public class Main {
         try {
             Database.connect();
 
-            ErrorHandling errorHandling = new ErrorHandling();
-            errorHandling.tryFixErrors();
+//            ErrorHandling errorHandling = new ErrorHandling();
+//            errorHandling.tryFixErrors();
 
 
-//            Replication replication = new Replication();
-//            replication.startReplication();
+            Replication replication = new Replication();
+            replication.startReplication();
 
         } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();
