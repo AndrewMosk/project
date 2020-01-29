@@ -6,10 +6,16 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
+        // ЧТО СДЕЛАТЬ
+        // создать скрипты для таблиц sl
         long starTime = System.currentTimeMillis();
 
         try {
             Database.connect();
+
+//            ErrorHandling errorHandling = new ErrorHandling();
+//            errorHandling.tryFixErrors();
+
 
             Replication replication = new Replication();
             replication.startReplication();
