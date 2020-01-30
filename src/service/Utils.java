@@ -110,8 +110,8 @@ public class Utils {
 
     public static String parseErrorGetChildTable(String error) {
         int index1 = error.indexOf("referenced from table", 0);
-        int index2 = error.indexOf("Где: SQL statement", 0);
-        error = error.substring(index1 + 23, index2 - 3);
+        int index2 = error.indexOf(".", 0);
+        error = error.substring(index1 + 23, index2-1);
 
         return error;
     }

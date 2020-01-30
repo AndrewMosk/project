@@ -37,12 +37,10 @@ public class Replication {
         try {
             stmt.executeUpdate(sqlQuery.toString());
         } catch (SQLException e) {
-            // если ошибка связана с транзакционностью вызываю метод удаления еще раз
-            if (Utils.transactionError(e.getMessage())) {
-                return true;
-            } else if (e.getMessage().contains("violates foreign key constraint")) {
+
+            if (e.getMessage().contains("violates foreign key constraint")) {
                 // генерирую текст запроса для поиска foreign key
-                String foreignKeySql = Utils.getForeignKeySql(table, Utils.parseErrorGetChildTable(e.getMessage()));
+                String foreignKeySql = Utils.getForeignKeySql(table.toLowerCase(), Utils.parseErrorGetChildTable(e.getMessage()));
                 ResultSet rs = stmt.executeQuery(foreignKeySql);
                 rs.next();
                 String foreignKey = rs.getString("t_column");
@@ -55,6 +53,9 @@ public class Replication {
                 stmt.executeUpdate(sqlDelete);
 
                 // ошибка битой ссылки устранена, снова пытаюсь удалить все строки данной таблицы
+                return true;
+            } else if (Utils.transactionError(e.getMessage())) {
+                // если ошибка связана с транзакционностью вызываю метод удаления еще раз
                 return true;
             } else {
                 // если какая-то другая ошибка (синтаксис или скажем неверный порядок вызова скрипта удаления) тогда запись в лог ошибок и переход к следующему
@@ -82,8 +83,8 @@ public class Replication {
                 StringBuilder sqlQuery = new StringBuilder(Utils.readSqlQuery("scripts/" + dir + "/d/" + tables[i].toLowerCase() + ".sql"));
                 continueLoad = true;
 
+                System.out.println("Deleting table " + tables[i]);
                 while (continueLoad) {
-                    System.out.println("Deleting table " + tables[i]);
                     continueLoad = deleteRows(sqlQuery, tables[i]);
                 }
             }

@@ -19,6 +19,11 @@ public class Test {
                 "Где: SQL statement \"DELETE FROM cl_mv WHERE r IN (select \"R_TABLE\"::bigint from ora_replog999 WHERE \"N_TABLE\" = CL_MV and \"OPER\" = D)\"\n" +
                 "PL/pgSQL function inline_code_block line 3 at SQL statement\n";
 
+//        String error = "ERROR: update or delete on table \"cl\" violates foreign key constraint \"cl_address_fk\" on table \"cl_address\"\n" +
+//                "  Подробности: Key (c_client)=(9990011614) is still referenced from table \"cl_address\".\n" +
+//                "  Где: SQL statement \"DELETE FROM cl WHERE c_client IN (select \"R_TABLE\"::bigint from ora_replog999 WHERE \"N_TABLE\" = 'CL' and \"OPER\" = 'D')\"\n" +
+//                "PL/pgSQL function inline_code_block line 3 at SQL statement";
+
         if (error.contains("violates foreign key constraint")) {
             // генерирую текст запроса для поиска foreign key
             String foreignKeySql = getForeignKeySql(parentTable, parseErrorGetChildTable(error));
@@ -33,11 +38,11 @@ public class Test {
             String sqlDelete = generateSqlDelete(error, childTable, foreignKey);
             int deletedRow = 0;
 
-            try {
-                deletedRow = stmt.executeUpdate(sqlDelete);
-            } catch (SQLException e) {
-                // обработка ошибки тут не требуется, т.к. удаляемая строка ТОЧНО есть в базе (иначе бы не упало удаление)
-            }
+//            try {
+//                deletedRow = stmt.executeUpdate(sqlDelete);
+//            } catch (SQLException e) {
+//                // обработка ошибки тут не требуется, т.к. удаляемая строка ТОЧНО есть в базе (иначе бы не упало удаление)
+//            }
 
             System.out.println("Была удалена " + deletedRow + " строка.");
             Database.close();
@@ -66,8 +71,8 @@ public class Test {
 
     private static String parseErrorGetChildTable(String error) {
         int index1 = error.indexOf("referenced from table", 0);
-        int index2 = error.indexOf("Где: SQL statement", 0);
-        error = error.substring(index1 + 23, index2 - 3);
+        int index2 = error.indexOf(".", 0);
+        error = error.substring(index1 + 23, index2-1);
 
         return error;
     }
