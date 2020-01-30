@@ -33,14 +33,28 @@ public class Replication {
     }
 
     private boolean deleteRows(StringBuilder sqlQuery, String table) throws SQLException {
-        //LoadResult loadResult = new LoadResult();
         String errorSql;
         try {
             stmt.executeUpdate(sqlQuery.toString());
         } catch (SQLException e) {
             // если ошибка связана с транзакционностью вызываю метод удаления еще раз
             if (Utils.transactionError(e.getMessage())) {
-                //loadResult.continueLoad = true;
+                return true;
+            } else if (e.getMessage().contains("violates foreign key constraint")) {
+                // генерирую текст запроса для поиска foreign key
+                String foreignKeySql = Utils.getForeignKeySql(table, Utils.parseErrorGetChildTable(e.getMessage()));
+                ResultSet rs = stmt.executeQuery(foreignKeySql);
+                rs.next();
+                String foreignKey = rs.getString("t_column");
+                String childTable = rs.getString("t_table");
+                // получаю код строки для удаления
+                foreignKey = foreignKey.substring(1, foreignKey.length() - 1);
+
+                // удаляются ВСЕ строки дочерней таблицы, у которых владелец уже удален в оракл и должен быть удален в постгри
+                String sqlDelete = Utils.generateSqlDelete(e.getMessage(), childTable, foreignKey);
+                stmt.executeUpdate(sqlDelete);
+
+                // ошибка битой ссылки устранена, снова пытаюсь удалить все строки данной таблицы
                 return true;
             } else {
                 // если какая-то другая ошибка (синтаксис или скажем неверный порядок вызова скрипта удаления) тогда запись в лог ошибок и переход к следующему
