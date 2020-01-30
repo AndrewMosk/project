@@ -18,7 +18,7 @@ public class Utils {
         try {
             Scanner sc = new Scanner(new File(path), StandardCharsets.UTF_8);
 
-            while(sc.hasNext()){
+            while (sc.hasNext()) {
                 result.append(sc.nextLine()).append("\n");
             }
         } catch (FileNotFoundException e) {
@@ -89,8 +89,55 @@ public class Utils {
         return result;
     }
 
+    // служебные методы для исправления ошибок при удалении
+    public static String generateSqlDelete(String error, String childTable, String foreignKey) {
+        String errorCode = parseErrorGetCodeDelete(error);
+
+        // генерирую текст запроса для удаления строки в дочерней таблице с битой ссылкой
+        return getSqlDelete(childTable, foreignKey, errorCode);
+    }
+
+    private static String getSqlDelete(String childTable, String foreignKey, String errorCode) {
+        return String.format("DELETE FROM %s WHERE %s = '%s'", childTable, foreignKey, errorCode);
+    }
+
+    private static String parseErrorGetCodeDelete(String error) {
+        int index1 = error.indexOf(")=(", 0);
+        int index2 = error.indexOf(") is still referenced from table", 0);
+        error = error.substring(index1 + 3, index2);
+        return error;
+    }
+
+    public static String parseErrorGetChildTable(String error) {
+        int index1 = error.indexOf("referenced from table", 0);
+        int index2 = error.indexOf(".", 0);
+        error = error.substring(index1 + 23, index2-1);
+
+        return error;
+    }
+
+    public static String getForeignKeySql(String parentTable, String childTable) {
+        String sql = "SELECT\n" +
+                "    y.table_name    AS f_table,\n" +
+                "    x.table_name    AS t_table,\n" +
+                "    array_agg(x.column_name::text) AS t_column\n" +
+                "FROM information_schema.referential_constraints c \n" +
+                "JOIN information_schema.key_column_usage x\n" +
+                "    ON x.constraint_name = c.constraint_name\n" +
+                "    AND x.constraint_schema = c.constraint_schema\n" +
+                "JOIN information_schema.key_column_usage y\n" +
+                "    ON y.ordinal_position = x.position_in_unique_constraint\n" +
+                "    AND y.constraint_schema = c.unique_constraint_schema\n" +
+                "    AND y.constraint_name = c.unique_constraint_name \n" +
+                "WHERE y.table_name = '%s' AND x.table_name = '%s'\n" +
+                "GROUP BY   t_table,  f_table";
+
+        return String.format(sql, parentTable, childTable);
+    }
+
+    // константы с именами таблиц
     public static String[][] getTablesOperationD() {
-        return new  String[][]  {
+        return new String[][]{
                 {"cl", "CL_ADDRESS", "CL_BANK", "CL_CONTACT", "CL_OKVED", "CL_P", "CL_POTR", "CL_POTRV", "CL_PSPIS", "CL_REZ", "CL_MVNP", "CL_MVPERS", "CL_MVRAB",
                         "CL_MVSPIS", "CL_MV", "CL_Z", "CL_ZSPIS", "CL_ZV", "CL_ZVSPIS", "CL_SR", "CL"},
 
@@ -99,8 +146,11 @@ public class Utils {
                 {"pers", "PERS_BOLN", "PERS_BOOK", "PERS_DEF", "PERS_LANG", "PERS_OR", "PERS_PCL", "PERS_POOR", "PERS_PROF", "PERS_PROFIL", "PERS_REZ", "PERS_SPAR", "PERS_SIELEV", "PERS_SPEC",
                         "PERS_SPEN", "PERS_STAJ", "PERS_CLOSE", "PERS_REZDOC", "ASK_OR", "ASK_PLIST", "PROF_ASK", "W_ASK", "PERS_DOP", "PERS"},
 
+                {"sl", "SL_ADDROBJ", "SL_ARE", "SL_CR", "SL_DGV", "SL_EXECUTOR", "SL_EXP_DBF_ORCL", "SL_GU", "SL_GUD", "SL_HOUSE", "SL_KLZN", "SL_OK_KZOT", "SL_OKSM", "SL_OKSO", "SL_OKVED", "SL_PAR",
+                    "SL_PERS", "SL_PLC", "SL_PROF", "SL_REZ", "SL_REZ_DET", "SL_REZ_OSN", "SL_RK", "SL_RK_OSN", "SL_SPAR", "SL_SPEC", "SL_STATPOK", "SL_STATREP", "SL_STATSTR", "SL_VACTYPE", "SL_WORK"},
+
                 {"vac", "VAC_AGR", "VAC_CR", "VAC_DEF", "VAC_DISTR", "VAC_FAIR", "VAC_FAIR_CL", "VAC_FAIR_DEF", "VAC_FAIR_PERS", "VAC_FAIR_PROF", "VAC_FREE_VAC", "VAC_FREE_PACK",
-                        "VAC_HISTORY", "VAC_KVOT_CONFIRM", "VAC_KVOT_DOC", "VAC_KVOT_RM", "VAC_KVOT_TRUD", "VAC_KVOT", "VAC_LANG", "VAC_LG", "VAC_ONV", "VAC_PC", "VAC_SPAR", "VAC_TRV","VAC_CNT", "VAC"},
+                        "VAC_HISTORY", "VAC_KVOT_CONFIRM", "VAC_KVOT_DOC", "VAC_KVOT_RM", "VAC_KVOT_TRUD", "VAC_KVOT", "VAC_LANG", "VAC_LG", "VAC_ONV", "VAC_PC", "VAC_SPAR", "VAC_TRV", "VAC_CNT", "VAC"},
 
                 {"avac", "AVAC_LG", "AVAC_ONV", "AVAC_TRV", "AVAC"},
 
@@ -114,9 +164,12 @@ public class Utils {
     }
 
     public static String[][] getTables() {
-        return new  String[][]  {
+        return new String[][]{
                 {"cl", "*CL", "CL_ADDRESS", "CL_BANK", "CL_CONTACT", "CL_OKVED", "CL_P", "CL_POTR", "CL_POTRV", "CL_PSPIS", "CL_REZ", "CL_MV", "CL_MVNP", "CL_MVPERS", "CL_MVRAB",
                         "CL_MVSPIS", "CL_Z", "CL_ZSPIS", "CL_ZV", "CL_ZVSPIS", "CL_SR"},
+
+//                {"sl", "SL_ADDROBJ", "SL_ARE", "SL_CR", "SL_DGV", "SL_EXECUTOR", "SL_EXP_DBF_ORCL", "SL_GU", "SL_GUD", "SL_HOUSE", "SL_KLZN", "SL_OK_KZOT", "SL_OKSM", "SL_OKSO", "SL_OKVED", "SL_PAR",
+//                        "SL_PERS", "SL_PLC", "SL_PROF", "SL_REZ", "SL_REZ_DET", "SL_REZ_OSN", "SL_RK", "SL_RK_OSN", "SL_SPAR", "SL_SPEC", "SL_STATPOK", "SL_STATREP", "SL_STATSTR", "SL_VACTYPE", "SL_WORK"},
                 {"sl", "SL_PERS"},
 
                 {"pers", "*PERS", "PERS_BOLN", "PERS_BOOK", "PERS_DEF", "PERS_LANG", "PERS_OR", "PERS_PCL", "PERS_POOR", "PERS_PROF", "PERS_PROFIL", "PERS_REZ", "PERS_SPAR", "PERS_SIELEV", "PERS_SPEC",
@@ -131,7 +184,7 @@ public class Utils {
 
                 {"prof", "PROF_AGR", "PROF_DIR", "PROF_VAC", "PROF_VAC_CL", "PROF_VAC_GR"},
 
-               {"unstructured", "*JOB_REZ", "*RK_REZ", "*RK_LIST", "*CONS", "*JOB_DIR"}, // в JOB_DIR есть ссылка на PERS, так что не такой он и неструктурированный
+                {"unstructured", "*JOB_REZ", "*RK_REZ", "*RK_LIST", "*CONS", "*JOB_DIR"}, // в JOB_DIR есть ссылка на PERS, так что не такой он и неструктурированный
 
                 {"s", "*S_ADEP", "*S_ALG", "*S_APERIOD", "*S_APERIODM", "*S_ARABN", "*S_ARABU", "*S_ARABV", "*S_ASPIS", "*S_ASPISD", "*S_DEP", "*S_FIL", "*S_FPERS", "*S_OTD", "*S_PERIOD", "*S_PERIODM",
                         "*S_PPS", "*S_RABDN", "*S_RABDU", "*S_RABN", "*S_RABU", "*S_RABV", "*S_SPIS", "*S_SPISD", "*S_SPNU", "*S_SPPROC", "*S_STAT", "*S_SVODN", "*S_SVODU", "*S_SVODV", "*S_VOZV"}
