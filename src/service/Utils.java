@@ -58,6 +58,10 @@ public class Utils {
         return message.contains("violates foreign key constraint");
     }
 
+    public static boolean duplicateError(String message) {
+        return message.contains("duplicate key value violates unique constraint");
+    }
+
     public static String generateLoadOwnerSql(String error) throws IOException {
         ErrorData errorData = parseError(error);
 
@@ -168,9 +172,8 @@ public class Utils {
                 {"cl", "*CL", "CL_ADDRESS", "CL_BANK", "CL_CONTACT", "CL_OKVED", "CL_P", "CL_POTR", "CL_POTRV", "CL_PSPIS", "CL_REZ", "CL_MV", "CL_MVNP", "CL_MVPERS", "CL_MVRAB",
                         "CL_MVSPIS", "CL_Z", "CL_ZSPIS", "CL_ZV", "CL_ZVSPIS", "CL_SR"},
 
-//                {"sl", "SL_ADDROBJ", "SL_ARE", "SL_CR", "SL_DGV", "SL_EXECUTOR", "SL_EXP_DBF_ORCL", "SL_GU", "SL_GUD", "SL_HOUSE", "SL_KLZN", "SL_OK_KZOT", "SL_OKSM", "SL_OKSO", "SL_OKVED", "SL_PAR",
-//                        "SL_PERS", "SL_PLC", "SL_PROF", "SL_REZ", "SL_REZ_DET", "SL_REZ_OSN", "SL_RK", "SL_RK_OSN", "SL_SPAR", "SL_SPEC", "SL_STATPOK", "SL_STATREP", "SL_STATSTR", "SL_VACTYPE", "SL_WORK"},
-                {"sl", "SL_PERS"},
+                {"sl", "SL_ADDROBJ", "SL_ARE", "SL_CR", "SL_DGV", "SL_EXECUTOR", "SL_EXP_DBF_ORCL", "SL_GU", "SL_GUD", "SL_HOUSE", "SL_KLZN", "SL_OK_KZOT", "SL_OKSM", "SL_OKSO", "SL_OKVED", "SL_PAR",
+                        "SL_PERS", "SL_PLC", "SL_PROF", "SL_REZ", "SL_REZ_DET", "SL_REZ_OSN", "SL_RK", "SL_RK_OSN", "SL_SPAR", "SL_SPEC", "SL_STATPOK", "SL_STATREP", "SL_STATSTR", "SL_VACTYPE", "SL_WORK"},
 
                 {"pers", "*PERS", "PERS_BOLN", "PERS_BOOK", "PERS_DEF", "PERS_LANG", "PERS_OR", "PERS_PCL", "PERS_POOR", "PERS_PROF", "PERS_PROFIL", "PERS_REZ", "PERS_SPAR", "PERS_SIELEV", "PERS_SPEC",
                         "PERS_SPEN", "PERS_STAJ", "PERS_CLOSE", "PERS_REZDOC", "ASK_OR", "ASK_PLIST", "PROF_ASK", "W_ASK", "*PERS_DOP"},
