@@ -68,12 +68,8 @@ public class Replication {
     }
 
     public void startReplication() throws SQLException, IOException {
-//        -----------------------------------------------------------------
-//        lineByLineLoad("vac", "VAC_KVOT_RM");
-//        -----------------------------------------------------------------
-
         System.out.println("start replication");
-//        //удаление данных
+        //удаление данных
         String[][] tablesArrayD = Utils.getTablesOperationD();
         boolean continueLoad;
         for (String[] tables : tablesArrayD) {
@@ -241,12 +237,6 @@ public class Replication {
 
         // получаю список кодов по текущей таблице
         ArrayList<String> listUpdateInsert = states.get(currentTable);
-//        -----------------------------------------------------------------
-//        ArrayList<String> listUpdateInsert = new ArrayList<>();
-//        listUpdateInsert.add("2130022706"); // нет
-//        listUpdateInsert.add("2130022705"); // нет
-//        listUpdateInsert.add("9910363515"); // есть в ора, нет в постгри
-//        -----------------------------------------------------------------
 
         //подгружаю общий текст sql запроса
         String sqlQuery = Utils.readSqlQuery("scripts/" + dir + "/s/" + currentTable.toLowerCase() + ".sql");
@@ -297,6 +287,9 @@ public class Replication {
                 // например, навык человека. нет смысла в двух строках "код пользователя" -- "код навыка" - в данном случае уникальный ключ образуют именно эти два параметра.
                 // если такая ошибка перехвачена, значит одна строка с данными параметрами уже загружена в постгри и эту ошибку я просто игнорирую, удаляя строку из реплога
                 stmt.executeUpdate(Utils.deleteFromOraReplog(currentTable, code));
+                // ошибку в лог не записываю, сразу перехожу к следующей строке
+                loadResult.continueLoad = false;
+                return;
             }
 
             // если программа пришла сюда, значит встретилась ошибка, для которой алгоритм обработки не предусмотрен. или владелец так и не был найден;
