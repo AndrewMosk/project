@@ -226,7 +226,7 @@ public class Replication {
                 return true;
             } else {
                 // если ошибка не транзакционного характера, бросаю исключение и прекращаю загрузку таблицы и ее дочерних
-                throw new RuntimeException();
+                throw new RuntimeException(e.getMessage());
             }
         }
         return false;

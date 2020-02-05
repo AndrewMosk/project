@@ -9,6 +9,6 @@ ON CONFLICT ("r") DO UPDATE SET "k_priz" = EXCLUDED.k_priz, "cz_cod" = EXCLUDED.
 		"pp_cod" = EXCLUDED.pp_cod, "pp_date" = EXCLUDED.pp_date, "sumv" = EXCLUDED.sumv, "kolv" = EXCLUDED.kolv, "cod_l" = EXCLUDED.cod_l, "p_modi" = EXCLUDED.p_modi, 
 		"d_modi" = EXCLUDED.d_modi;
 --удаляю обработанные строки из оракл		
-DELETE FROM ora_replog999 WHERE "N_TABLE" = 'AGR_SPIS' AND "R_TABLE" IN = '%s';
+DELETE FROM ora_replog999 WHERE "N_TABLE" = 'AGR_SPIS' AND "R_TABLE" = '%s';
 END;
 $$ LANGUAGE plpgsql;
