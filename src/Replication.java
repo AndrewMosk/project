@@ -115,6 +115,9 @@ public class Replication {
                 }
             }
         }
+
+        // инкремент!
+        String[] tablesToIncrement = Utils.getTablesOpertaionI();
     }
 
     private void uploadDataForReplication(String[] tables) {
@@ -124,7 +127,7 @@ public class Replication {
 
         for (int i = 1; i < tables.length; i++) {
             continueLoad = true;
-            sql = Utils.getReplicationLog(tables[i].replace("*", ""), "S");
+            sql = Utils.getReplicationLogOperS(tables[i].replace("*", ""));
 
             while (continueLoad) {
                 continueLoad = loadCurrentTable(sql, tables[i]);
