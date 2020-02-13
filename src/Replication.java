@@ -70,21 +70,21 @@ public class Replication {
     public void startReplication() throws SQLException, IOException {
         System.out.println("start replication");
         //удаление данных
-        String[][] tablesArrayD = Utils.getTablesOperationD();
-        boolean continueLoad;
-        for (String[] tables : tablesArrayD) {
-            String dir = tables[0];
-
-            for (int i = 1; i < tables.length; i++) {
-                StringBuilder sqlQuery = new StringBuilder(Utils.readSqlQuery("scripts/" + dir + "/d/" + tables[i].toLowerCase() + ".sql"));
-                continueLoad = true;
-
-                System.out.println("Deleting table " + tables[i]);
-                while (continueLoad) {
-                    continueLoad = deleteRows(sqlQuery, tables[i]);
-                }
-            }
-        }
+//        String[][] tablesArrayD = Utils.getTablesOperationD();
+//        boolean continueLoad;
+//        for (String[] tables : tablesArrayD) {
+//            String dir = tables[0];
+//
+//            for (int i = 1; i < tables.length; i++) {
+//                StringBuilder sqlQuery = new StringBuilder(Utils.readSqlQuery("scripts/" + dir + "/d/" + tables[i].toLowerCase() + ".sql"));
+//                continueLoad = true;
+//
+//                System.out.println("Deleting table " + tables[i]);
+//                while (continueLoad) {
+//                    continueLoad = deleteRows(sqlQuery, tables[i]);
+//                }
+//            }
+//        }
 
         // добавление/изменение данных
         String[][] tablesArray = Utils.getTables();
@@ -117,7 +117,7 @@ public class Replication {
         }
 
         // инкремент!
-        String[] tablesToIncrement = Utils.getTablesOpertaionI();
+        //String[] tablesToIncrement = Utils.getTablesOpertaionI();
     }
 
     private void uploadDataForReplication(String[] tables) {

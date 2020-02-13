@@ -4,7 +4,7 @@ INSERT INTO
 	sl_rk_osn ("rk_cod", "rk_osn", "npp", "rkd_cod", "rkd_osn", "rk_name", "p_dn", "p_de", "p_s", "p_i", "commz", "comm", "commp", "bak", "pr", "rk_named", "prim", 
 		"osn_code", "psir", "ppens", "p_prodm", "p_prodd", "p_alg", "docfile", "repfile", "osn_eais", "osn_namel", "rk_srokd", "rk_srokm", "p_modi", "d_modi")
 SELECT "rk_cod", "rk_osn", "npp", "rkd_cod", "rkd_osn", "rk_name", "p_dn", "p_de", "p_s", "p_i", "commz", "comm", "commp", "bak", "pr", "rk_named", "prim", 
-		"osn_code", "psir", "PPENS" AS "ppens", "p_prodm", "p_prodd", "p_alg", "docfile", "repfile", "osn_eais", "osn_namel", "rk_srokd", "rk_srokm", "p_modi", "d_modi"
+		"osn_code", "psir", "ppens", "p_prodm", "p_prodd", "p_alg", "docfile", "repfile", "osn_eais", "osn_namel", "rk_srokd", "rk_srokm", "p_modi", "d_modi"
 FROM ora_sl_rk_osn WHERE ora_sl_rk_osn.rk_osn = '%s'
 ON CONFLICT ("rk_osn") DO UPDATE SET "rk_cod" = EXCLUDED.rk_cod, "npp" = EXCLUDED.npp, "rkd_cod" = EXCLUDED.rkd_cod, "rkd_osn" = EXCLUDED.rkd_osn, 
 		"rk_name" = EXCLUDED.rk_name, "p_dn" = EXCLUDED.p_dn, "p_de" = EXCLUDED.p_de, "p_s" = EXCLUDED.p_s, "p_i" = EXCLUDED.p_i, "commz" = EXCLUDED.commz, 
