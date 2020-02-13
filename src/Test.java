@@ -22,14 +22,12 @@ public class Test {
         String delta;
 
         // отладил - можно прикручивать к продакшн :-)
-        // ОООО!! в срипт (vac_cnt.sql) нужно добавить удаление из реплога строки! и тут опять упираюсь в то, что из реплога не удалить :-(
-
 
         // ну и продумать как выполнить первоначальную синхронизцию с ораклом.
         // думаю не стоит все полностью стриать... нужно прогнать oper S и D - супер будет,
         // если после этой процедуры количество строк в разных БД станет одинаковым...
         // а потом запустить скрипт, который пачкой добавляет все, что есть,
-        // а при конфликте апдейтит
+        // а при конфликте апдейтит ----> этот скрипт в папке vac\i
         String[] tablesToIncrement = Utils.getTablesOpertaionI();
         String dir = tablesToIncrement[0];
         for (int i = 1; i < tablesToIncrement.length; i++) {
@@ -39,7 +37,7 @@ public class Test {
                 n_field = rs.getString("N_FIELD");
                 delta = rs.getString("sum").split("\\.")[0];
 
-                String currentSql = String.format(sql, n_field, n_field, delta, r_table);
+                String currentSql = String.format(sql, n_field, n_field, delta, r_table, r_table);
 
                 System.out.println(currentSql);
                 //stmt.executeUpdate(currentSql);
