@@ -12,6 +12,9 @@ public class Test {
     public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
         Database.connect();
         stmt = Database.getStmt();
+        // значения результата запроса буду записывать в HashMap. ключ - номер ваканасии...
+        // или нафиг надо?
+
         String sqlQuery = Utils.getReplicationLogOperI("VAC_CNT");
 
         ResultSet rs = stmt.executeQuery(sqlQuery + "limit 100");
@@ -20,29 +23,20 @@ public class Test {
         String n_field;
         String delta;
 
-        // отладил - можно прикручивать к продакшн :-)
-        // ОООО!! в срипт (vac_cnt.sql) нужно добавить удаление из реплога строки! и тут опять упираюсь в то, что из реплога не удалить :-(
+        // вот тут читаю файл с диска ----> "UPDATE %s SET %s = %s + %s where vac_num = '%s'" вот такой
+        // UPDATE vac_cnt SET cur_spr = cur_spr + '69' where vac_num = '100167824'
 
-
-        // ну и продумать как выполнить первоначальную синхронизцию с ораклом.
-        // думаю не стоит все полностью стриать... нужно прогнать oper S и D - супер будет,
-        // если после этой процедуры количество строк в разных БД станет одинаковым...
-        // а потом запустить скрипт, который пачкой добавляет все, что есть,
-        // а при конфликте апдейтит
+        // ОТЛАДИТЬ!!!
         String[] tablesToIncrement = Utils.getTablesOpertaionI();
         String dir = tablesToIncrement[0];
         for (int i = 1; i < tablesToIncrement.length; i++) {
-            String sql = Utils.readSqlQuery("scripts/" + dir + "/i/" + tablesToIncrement[i].toLowerCase() + ".sql");
+            String sql = Utils.readSqlQuery("scripts/" + dir + "/s/" + tablesToIncrement[i].toLowerCase() + ".sql");
             while (rs.next()) {
                 r_table = rs.getString("R_TABLE");
                 n_field = rs.getString("N_FIELD");
-                delta = rs.getString("sum").split("\\.")[0];
+                delta = rs.getString("sum");
 
                 String currentSql = String.format(sql, n_field, n_field, delta, r_table);
-
-                System.out.println(currentSql);
-                //stmt.executeUpdate(currentSql);
-                break;
             }
 
         }
