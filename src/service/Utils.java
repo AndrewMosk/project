@@ -16,7 +16,7 @@ public class Utils {
     public static String readSqlQuery(String path) throws IOException {
         StringBuilder result = new StringBuilder();
         try {
-            Scanner sc = new Scanner(new File(path), StandardCharsets.UTF_8);
+            Scanner sc = new Scanner(new File(path), "UTF-8");
 
             while (sc.hasNext()) {
                 result.append(sc.nextLine()).append("\n");
@@ -50,15 +50,15 @@ public class Utils {
         return String.format(sql, n_table, n_table);
     }
 
-    public static String getReplicationLogOperI(String n_table) {
-        String sql = "SELECT \"R_TABLE\", \"N_FIELD\", SUM(\"DELTA\") FROM ora_replog999 WHERE \"N_TABLE\" = '%s' AND \"OPER\" = 'I' AND \"R_TABLE\" NOT IN \n" +
-                " \t(SELECT r FROM error_repl_log WHERE \"table\" = '%s') GROUP BY \"R_TABLE\", \"N_FIELD\"";
+    public static String getReplicationLogVacCntOperI() {
+        return "SELECT \"R_TABLE\", \"N_FIELD\", SUM(\"DELTA\") FROM ora_replog999 WHERE \"N_TABLE\" = 'VAC_CNT' AND \"OPER\" = 'I' AND \"R_TABLE\" NOT IN \n" +
+                " \t(SELECT r FROM error_repl_log WHERE \"table\" = 'VAC_CNT') GROUP BY \"R_TABLE\", \"N_FIELD\"";
 
-        return String.format(sql, n_table, n_table);
+        //return String.format(sql, n_table, n_table);
     }
 
     public static boolean transactionError(String message) {
-        return message.contains("08177") || message.contains("01555");
+        return message.contains("ORA-08177") || message.contains("ORA-01555");
     }
 
     public static boolean ownerError(String message) {
@@ -186,7 +186,6 @@ public class Utils {
 
     public static String[][] getTables() {
         return new String[][]{
-//                {"unstructured", "JOB_DIR"}
                 {"cl", "*CL", "CL_ADDRESS", "CL_BANK", "CL_CONTACT", "CL_OKVED", "CL_P", "CL_POTR", "CL_POTRV", "CL_PSPIS", "CL_REZ", "CL_MV", "CL_MVNP", "CL_MVPERS", "CL_MVRAB",
                         "CL_MVSPIS", "CL_Z", "CL_ZSPIS", "CL_ZV", "CL_ZVSPIS", "CL_SR"},
 
@@ -212,7 +211,7 @@ public class Utils {
         };
     }
 
-    public static String[] getTablesOpertaionI() {
+    public static String[] getTablesOperationI() {
         return new String[]{"vac", "VAC_CNT"};
     }
 }
