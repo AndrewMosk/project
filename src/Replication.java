@@ -164,8 +164,6 @@ public class Replication {
                         break;
                     }
                 } else {
-//                    System.out.println("start lineByLineLoad " + tables[i]);
-                    //lineByLineLoad(dir, tables[i]);
                     if (!tables[i].equals("VAC_CNT")) {
                         System.out.println("start lineByLineLoad " + tables[i]);
                         lineByLineLoad(dir, tables[i]);
@@ -203,7 +201,7 @@ public class Replication {
         //  Подробности: ORA-08177: can't serialize access for this transaction
 
         Database.connectOracle();
-        Statement stmtOracle = Database.getStmtOracle();
+        stmtOracle = Database.getStmtOracle();
         Connection connectionPostgres = Database.getConnectionPostgre();
 
         try {
@@ -344,10 +342,10 @@ public class Replication {
         // отменяю авто коммит
         connectionPostgres.setAutoCommit(false);
         boolean attemptOwnerLoad = false;
-        int counter = 0;
+//        int counter = 0;
         for (String[] arr : arrayList) {
-            System.out.println(counter);
-            counter++;
+//            System.out.println(counter);
+//            counter++;
             clearCode(sqlUpdateInsertBuilder);
             clearCode(sqlDeleteFromOracleSBuilder);
 

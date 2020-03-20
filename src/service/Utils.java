@@ -196,7 +196,8 @@ public class Utils {
                         "PERS_SPEN", "PERS_STAJ", "PERS_CLOSE", "PERS_REZDOC", "ASK_OR", "ASK_PLIST", "PROF_ASK", "W_ASK", "*PERS_DOP"},
 
                 {"vac", "*VAC", "VAC_AGR", "VAC_CR", "VAC_DEF", "VAC_DISTR", "VAC_FAIR", "VAC_FAIR_CL", "VAC_FAIR_DEF", "VAC_FAIR_PROF", "VAC_FREE_PACK", "VAC_FREE_VAC",
-                        "VAC_HISTORY", "VAC_KVOT", "VAC_KVOT_CONFIRM", "VAC_KVOT_DOC", "VAC_KVOT_RM", "VAC_KVOT_TRUD", "VAC_LANG", "VAC_LG", "VAC_ONV", "VAC_PC", "VAC_SPAR", "VAC_TRV"}, //"VAC_CNT", "VAC_FAIR_PERS"
+                        "VAC_HISTORY", "VAC_KVOT", "VAC_KVOT_CONFIRM", "VAC_KVOT_DOC", "VAC_KVOT_RM", "VAC_KVOT_TRUD", "VAC_LANG", "VAC_LG", "VAC_ONV", "VAC_PC", "VAC_SPAR", "VAC_TRV",
+                        "VAC_FAIR_PERS", "VAC_CNT"},
 
                 {"avac", "*AVAC", "AVAC_LG", "AVAC_ONV", "AVAC_TRV"},
 
