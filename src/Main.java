@@ -9,7 +9,7 @@ public class Main {
         long starTime = System.currentTimeMillis();
 
         try {
-            Database.connect();
+            Database.connectPostgre();
 
 //            ErrorHandling errorHandling = new ErrorHandling();
 //            errorHandling.tryFixErrors();
@@ -21,9 +21,9 @@ public class Main {
         } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();
             Mail mail = new Mail();
-            mail.send("Ошибка старта репликации", e.getMessage());
+            mail.send("Ошибка репликации", e.getMessage());
         }
-        Database.close();
+        Database.closePostgre();
 
         System.out.println((System.currentTimeMillis() - starTime) / 1000);
     }

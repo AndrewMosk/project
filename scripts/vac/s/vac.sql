@@ -11,7 +11,7 @@ SELECT "vac_num", "type_cod", "in_date", "cz_cod", "c_client", "c_contact", "pro
 		SPE.spe_cod, "stin_cod", "ncp_cod", "pr_comp", "cntc_cod", "ident_yn", "pr_show", "ness_stage", "educ_cod", "driv_cod", "okso_cod", "spec_cod", 
 		"kval_cod", "prof_cod2", "dolz_ob", "usl", "treb", "adinf70", "adinfcl", "adinf", "att_f", "beg_date", "end_date", "rem_text", "vac_guid", 
 		"inst_date", "r", "agr_cod", "pr_sod", "r_vac_agr", "p_modi", "d_modi"  FROM (SELECT * 
-	 FROM ora_vac WHERE ora_vac.vac_num IN %s) AS ora_vac_filter
+	 FROM ora_vac WHERE ora_vac.vac_num IN %s AND ora_vac.salary is not null) AS ora_vac_filter
 		LEFT JOIN (SELECT sl_spar.par_cod AS spe_cod, sl_spar.par_code AS par_code FROM sl_spar	WHERE sl_spar.gpar_cod = '129') AS SPE
 			ON ora_vac_filter.spe_code = SPE.par_code
 ON CONFLICT ("vac_num") DO UPDATE SET "type_cod" = EXCLUDED.type_cod, "in_date" = EXCLUDED.in_date, "cz_cod" = EXCLUDED.cz_cod, "c_client" = EXCLUDED.c_client, 

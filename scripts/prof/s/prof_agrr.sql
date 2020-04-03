@@ -12,6 +12,6 @@ ON CONFLICT ("agr_cod") DO UPDATE SET "cz_cod" = EXCLUDED.cz_cod, "c_client" = E
 		"agr_vid" = EXCLUDED.agr_vid, "vid_ob" = EXCLUDED.vid_ob, "vid_zan" = EXCLUDED.vid_zan, "rem_text" = EXCLUDED.rem_text, "p_modi" = EXCLUDED.p_modi, 
 		"d_modi" = EXCLUDED.d_modi;
 --удаляю обработанные строки из оракл		
-DELETE FROM ora_replog999 WHERE "N_TABLE" = 'PROF_AGR' AND "R_TABLE"  = '%s';
+DELETE FROM ora_replog999 WHERE "N_TABLE" = 'PROF_AGRR' AND "R_TABLE"  = '%s';
 END;
 $$ LANGUAGE plpgsql;

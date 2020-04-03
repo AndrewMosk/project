@@ -5,7 +5,7 @@ INSERT INTO
 		"agr_money", "cod_l", "rp_cod", "agr_vid", "ncp_cod", "cjtyp_cod", "agr_count", "likv_kol", "likv_comm", "p_modi", "d_modi")
 SELECT "agr_cod", "c_client", "cz_cod", "type_cod", VIF.vif_cod, "agr_num", "agr_form", "p_ra", "c_contact", "c_sign", "agr_begin", "agr_time", "date_beg", "date_end",
 		"agr_money", "cod_l", RP.rp_cod, "agr_vid", "ncp_cod", "cjtyp_cod", "agr_count", "likv_kol", "likv_comm", "p_modi", "d_modi"   FROM (SELECT * 
-	 FROM ora_agr_or WHERE ora_agr_or.agr_cod = '%s') AS ora_agr_or_filter
+	 FROM ora_agr_or WHERE ora_agr_or.agr_cod = '%s'  AND ora_agr_or.c_client is not null) AS ora_agr_or_filter
 		LEFT JOIN (SELECT sl_spar.par_cod AS vif_cod, sl_spar.par_code AS par_code FROM sl_spar	WHERE sl_spar.gpar_cod = '133') AS VIF
 			ON ora_agr_or_filter.vif_cod = VIF.par_code
 		LEFT JOIN (SELECT sl_spar.par_cod AS rp_cod, sl_spar.par_code AS par_code FROM sl_spar	WHERE sl_spar.gpar_cod = '142') AS RP

@@ -11,7 +11,7 @@ public class ErrorHandling {
     private Statement stmt;
 
     public ErrorHandling() {
-        this.stmt = Database.getStmt();
+        this.stmt = Database.getStmtPostgre();
         //this.n_table = n_table;
     }
 
