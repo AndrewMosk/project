@@ -94,17 +94,24 @@ public class Utils {
     private static ErrorData parseError(String error) {
         ErrorData result = new ErrorData();
 
-        int index1 = error.indexOf("Подробности:", 0);
-        int index2 = error.indexOf("Где:", 0);
+        int index1;
+        int index2;
+        if (error.contains("Подробности")) {
+            index1 = error.indexOf("Подробности:", 0);
+            index2 = error.indexOf("Где:", 0);
+        } else {
+            index1 = error.indexOf("DETAIL:", 0);
+            index2 = error.indexOf("CONTEXT:", 0);
+        }
         error = error.substring(index1, index2);
 
         String[] split = error.split("=");
-        index1 = split[1].indexOf("(") + 1;
+        index1 = split[1].indexOf("(") + 1; // прибавляю 1, т.к. саму скобку в индексе мне учитывать не надо
         index2 = split[1].indexOf(")");
         result.r = split[1].substring(index1, index2);
 
-        index1 = split[1].indexOf("table") + 7;
-        index2 = split[1].length() - 5;
+        index1 = split[1].indexOf("table \"")+7; // аналогично прибавляю 7 (длину поисковой строки), т.к. получаю индекс начала строки поиска, а мне как раз нужен ее конец
+        index2 = split[1].indexOf("\".");
         result.n_table = split[1].substring(index1, index2);
 
         return result;
@@ -205,9 +212,9 @@ public class Utils {
 
                 {"prof", "PROF_AGRR", "PROF_DIR", "PROF_VAC", "PROF_VAC_CL", "PROF_VAC_GR", "PROF_CEL"},
 
-                {"unstructured", "*JOB_REZ", "*RK_REZ", "*RK_LIST", "*CONS", "JOB_DIR"}, // в JOB_DIR есть ссылка на PERS, так что не такой он и неструктурированный
+                {"unstructured", "*JOB_REZ", "RK_REZ", "*RK_LIST", "*CONS", "JOB_DIR"}, // в JOB_DIR есть ссылка на PERS, так что не такой он и неструктурированный
 
-                {"s", "*S_ADEP", "*S_ALG", "*S_APERIOD", "*S_APERIODM", "*S_ARABN", "*S_ARABU", "*S_ARABV", "*S_ASPIS", "*S_ASPISD", "*S_DEP", "*S_FIL", "*S_FPERS", "*S_OTD", "*S_PERIOD", "*S_PERIODM",
+                {"s", "*S_ADEP", "S_ALG", "*S_APERIOD", "*S_APERIODM", "*S_ARABN", "*S_ARABU", "*S_ARABV", "*S_ASPIS", "*S_ASPISD", "*S_DEP", "*S_FIL", "*S_FPERS", "*S_OTD", "*S_PERIOD", "*S_PERIODM",
                         "*S_PPS", "*S_RABDN", "*S_RABDN_BAK", "*S_RABDU", "*S_RABN", "*S_RABU", "*S_RABV", "*S_SPIS", "*S_SPISD", "*S_SPNU", "*S_SPPROC", "*S_STAT", "*S_SVODN", "*S_SVODU", "*S_SVODV", "*S_VOZV", "*S_OST"}
         };
     }
